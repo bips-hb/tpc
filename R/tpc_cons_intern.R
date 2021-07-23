@@ -1,82 +1,8 @@
-#' Utility for Conservative and Majority Rule in tpc
-#'
-#' Like pcalg::pc.cons.intern, but takes into account a user-specified partial
-#' ordering.
-#'
-#' @param sk A skeleton object as returned from \code{pcalg::\link[pcalg]{skeleton}}.
-#' @param suffStat is a list containing all relevant elements for the conditional
-#' independence decisions.
-#' @param indepTest Pre-defined \code{\link[base]{function}} for testing
-#' conditional independence. The function is internally called as
-#' \code{indepTest(x,y,S,suffStat)}, and tests conditional independence of
-#' \code{x} and \code{y} given \code{S}. Here, \code{x} and \code{y} are
-#' variables, and \code{S} is a (possibly empty) vector of variables (all
-#' variables are denoted by their (integer) column positions in the adjacency
-#'  matrix). The return value of \code{indepTest} is the p-value of the test for
-#'  conditional independence.
-#' @param alpha significance level for the individual conditional independence tests.
-#' @param version.unf Vector of length two. If \code{version.unf[2]==1}, the
-#' inititial separating set found by the PC/FCI algorithm is added to the set of
-#' separating sets; if \code{version.unf[2]==2}, it is not added. In the latter
-#' case, if the set of separating sets is empty, the triple is marked as
-#' unambiguous if \code{version.unf[1]==1}, and as ambiguous if
-#' \code{version.unf[1]==2}.
-#' @param maj.rule  Logical indicatin if the triples are checked for ambiguity
-#' using the majority rule idea, which is less strict than the standard
-#' conservative method.
-#' @param verbose  Logical asking for detailed output.
-#' @param tiers  Numeric vector specifying the tier / time point for each variable.
-#' A smaller number corresponds to an earlier tier / time point. Conditional
-#' independence testing is restricted such that if x is in tier t(x) and y is in
-#' t(y), only those variables are allowed in the conditioning set whose tier is
-#' not larger than max(t(x), t(y)).
-#' @param context.all Numeric vector. Specifies the positions or names of global
-#' context variables. Global context variables have no incoming edges, i.e. no
-#' parents, and are themselves parents of all non-context variables in the graph.
-#' @param context.tier  Numeric vector. Specifies the positions or names of
-#' tier-specific context variables. Tier-specific context variables have no
-#' incoming edges, i.e. no parents, and are themselves parents of all non-context
-#' variables in the same tier.
-#'
-#' @details See \code{pcalg::\link[pcalg]{pc.cons.intern}} for further information
-#' on the majority and conservative approaches to learning v-structures.
-#'
-#' Specifying a tier for each variable using the \code{tier} argument has the
-#' following effects:
-#'
-#' 1) Only those triples x-y-z are considered as potential
-#' v-structures that satisfy t(y)=max(t(x),t(z)). This allows for three
-#' constellations: either y is in the same tier as x and both are later than z,
-#' or y is in the same tier as z and both are later than x, or all three are in
-#' the same tier. Triples where y is earlier than one or both of x and z need
-#' not be considered, as y being a collider would be against the partial ordering.
-#' Triples where y is later than both x and z will be oriented later in the pc
-#' algorithm and are left out here to minimise the number of conditional
-#' independence tests.
-#'
-#' 2) Conditional independence testing is restricted such
-#' that if x is in tier t(x) and y is in t(y), only those variables are allowed
-#' in the conditioning set whose tier is not larger than max(t(x), t(y)).
-#'
-#' If \code{exotier} or \code{exoall} is specified, the variables in those
-#' arguments are not considered as candidate colliders or candidate parents of colliders.
-#'
-#' @return
-#' @param unfTripl numeric vector of triples coded as numbers
-#' (via \code{pcalg::triple2numb}) that were marked as ambiguous.
-#' @param sk The updated skeleton-object (separating sets might have been
-#' updated).
-#'
-#' @author Original code by Markus Kalisch and Diego Colombo.
-#' Modifications by Janine Witte.
-#'
-#' @export
-#'
-#' @examples
 
-tpc.cons.intern <- function (sk, suffStat, indepTest, alpha, version.unf = c(NA, NA),
-                             maj.rule = FALSE, verbose = FALSE, tiers=NULL,
-                             context.all=NULL, context.tier=NULL, forbEdges=NULL) {
+tpc.cons.intern <- function(
+  sk, suffStat, indepTest, alpha, version.unf = c(NA, NA),
+  maj.rule = FALSE, forbEdges=NULL, tiers=NULL,
+  context.all=NULL, context.tier=NULL, verbose = FALSE) {
 
   orientConflictCollider <- function(pdag, x, y, z) {
     if (pdag[x, y] == 1) {
@@ -202,7 +128,8 @@ tpc.cons.intern <- function (sk, suffStat, indepTest, alpha, version.unf = c(NA,
         }
         ############################# new code
         # mark this triple as 'to be oriented' if it meets the assumptions
-        if ( (r.abc$decision == 1) && ((version.unf[1] == 1) | (version.unf[1]==2) & r.abc$version==1) ) {
+        if ( (r.abc$decision == 1) &&
+             ((version.unf[1] == 1) | (version.unf[1]==2) & r.abc$version==1) ){
           tripleMatrix[i,4] <- 1
         }
         ############################# end new code

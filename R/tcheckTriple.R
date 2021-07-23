@@ -1,3 +1,4 @@
+
 tcheckTriple <- function (a, b, c, nbrsA, nbrsC, sepsetA, sepsetC, suffStat,
           indepTest, alpha, version.unf = c(NA, NA), maj.rule = FALSE,
           verbose = FALSE, NAdelete=TRUE) {

@@ -1,171 +1,14 @@
-#' Use PC while Accounting for a Partial Ordering
-#'
-#' Like \code{pcalg::\link[pcalg]{pc}}, but takes into account a user-specified
-#' partial ordering. The conditional independence between \code{x} and \code{y}
-#' given \code{S} is only tested if all variables in \code{S} precede at least
-#' one of \code{x} and \code{y} in the partial ordering, or are in the same tier
-#' as \code{x} and \code{y}. Edges cannot be oriented from a higher-order to a
-#' lower-order node. In addition, context variables can be specified
-#' (see below for details).
-#'
-#' @param suffStat A \code{\link[base]{list}} of sufficient statistics,
-#' containing all necessary elements for the conditional independence decisions
-#' in the function \code{indepTest}.
-#' @param indepTest  A \code{\link[base]{function}} for testing conditional
-#' independence. It is internally called as \code{indepTest(x,y,S,suffStat)},
-#' and tests conditional independence of \code{x} and \code{y} given \code{S}.
-#' Here, \code{x} and \code{y} are variables, and \code{S} is a (possibly empty)
-#' vector of variables (all variables are denoted by their (integer) column
-#' positions in the adjacency matrix). \code{suffStat} is a list, see the
-#' argument above. The return value of \code{indepTest} is the p-value of the
-#' test for conditional independence.
-#' @param alpha significance level (number in \emph{(0,1)} for the individual
-#' conditional independence tests.
-#' @param labels (optional) character vector of variable (or "node") names.
-#' Typically preferred to specifying \code{p}.
-#' @param p (optional) number of variables (or nodes). May be specified if
-#' \code{labels} are not, in which case \code{labels} is set to \code{1:p}.
-#' @param fixedGaps logical \emph{symmetric} matrix of dimension p*p. If entry
-#' \code{[i,j]} is true, the edge \emph{i-j} is removed before starting the
-#' algorithm. Therefore, this edge is guaranteed to be \emph{absent} in the
-#' resulting graph.
-#' @param fixedEdges A logical \emph{symmetric} matrix of dimension p*p.
-#' If entry \code{[i,j]} is true, the edge \emph{i-j} is never considered for
-#' removal. Therefore, this edge is guaranteed to be \emph{present} in the
-#' resulting graph.
-#' @param m.max Maximal size of the conditioning sets that are considered in the
-#' conditional independence tests.
-#' @param skel.method  Character string specifying method; the default,
-#' "\code{stable}" provides an \emph{order-independent} skeleton,
-#' see \code{\link{skeleton}}.
-#' @param conservative  Logical indicating if the conservative PC is used. In
-#' this case, only option \code{u2pd = "relaxed"} is supported. Note that
-#' therefore the resulting object might not be extendable to a DAG. See details
-#' for more information.
-#' @param maj.rule  Logical indicating that the triples shall be checked for
-#' ambiguity using a majority rule idea, which is less strict than the
-#' conservative PC algorithm. For more information, see details.
-#' @param NAdelete If indepTest returns \code{NA} and this option is \code{TRUE}, the corresponding edge is deleted. If this option is \code{FALSE}, the edge is not deleted.
-#' @param verbose  if \code{TRUE}, detailed output is provided.
-#' @param tiers Numeric vector specifying the tier / time point for each variable.
-#' Must be of length 'p', if specified, or have the same length as 'labels',
-#' if specified. A smaller number corresponds to an earlier tier / time point.
-#' Conditional independence testing is restricted such that if x is in tier t(x)
-#' and y is in t(y), only those variables are allowed in the conditioning set
-#' whose tier is not larger than max(t(x), t(y)).
-#' @param context.all Numeric or character vector. Specifies the positions or
-#' names of global context variables. Global context variables have no incoming
-#' edges, i.e. no parents, and are themselves parents of all non-context
-#' variables in the graph.
-#' @param context.tier  Numeric or character vector. Specifies the positions or
-#' names of tier-specific context variables. Tier-specific context variables
-#' have no incoming edges, i.e. no parents, and are themselves parents of all
-#' non-context variables in the same tier.
-#'
-#' @details See \code{pcalg::\link[pcalg]{pc}} for further information on the PC
-#' algorithm.
-#'
-#' Specifying a tier for each variable using the \code{tier} argument has the
-#' following effects: 1) In the skeleton phase and v-structure learing phases,
-#' conditional independence testing is restricted such that if x is in tier t(x)
-#' and y is in t(y), only those variables are allowed in the conditioning set
-#' whose tier is not larger than max(t(x), t(y)). 2) Following the v-structure
-#' phase, all edges that were found between two tiers are directed into the
-#' direction of the higher-order tier. If context variables are specifiec using
-#' \code{context.all} and/or \code{context.tier}, the corresponding orientations
-#' are added in this step.
-#'
-#' A note regarding Meek's rules:\cr
-#' Note that only rules 1-3 of Meek's rules are implemented, rule 4 is missing.
-#' This is only appropriate when PC is used without background knowledge,
-#' but here we have a partial ordering, so it would be more appropriate to use
-#' all four rules and we should implement that should we ever plan to make this
-#' a real package accessible for people outside our group.
-#'
-#' @return An object of \code{\link[base]{class}} "\code{pcAlgo}"
-#' (see \code{\link[pcalg]{pcAlgo}}) containing an estimate of the equivalence
-#' class of the underlying DAG.
-#'
-#' @author Original code by Markus Kalisch, Martin Maechler, and Diego Colombo.
-#' Modifications by Janine Witte.
-#'
-#' @export
-#'
-#' @examples
-#' ## Load Gaussian data from pcalg package
-#' data(gmG)
-#' n <- nrow(gmG8$x)
-#' V <- colnames(gmG8$x)
-#'
-#' ## estimate CPDAG
-#' tpc.fit <- tpc(suffStat = list(C = cor(gmG8$x), n = n),
-#'                indepTest = gaussCItest,
-#'                alpha = 0.01, labels = V,
-#'                tiers = c(1,1,2,2,3,3,3,3),
-#'                context.all = "Author",
-#'                context.tier = "V5")
-#'
-#' ## estimate CPDAG using data with missing values
-#' daten <- mice::windspeed[,1]
-#' for(i in 2:ncol(windspeed)) daten <- c(daten, windspeed[,i])
-#' daten[sample(1:length(daten), 260)] <- NA
-#' daten <- matrix(daten, ncol = 6)
-#'
-#' ## Using gaussCItestMI
-#' imp <- mice(daten)
-#' tpc.fit2 <- tpc(suffStat = imp,
-#'                indepTest = gaussCItestMI,
-#'                 alpha = 0.01, labels = colnames(imp$data),
-#'                 tiers = c(1,1,2,2,2,2))
-#'
-#' ## Using mixMItest
-#' suffStat <- mice::complete(imp, action = "all")
-#' tpc.fit3 <- tpc(suffStat = suffStat,
-#'                indepTest = mixMItest,
-#'                 alpha = 0.01, labels = colnames(imp$data),
-#'                 tiers = c(1,1,2,2,2,2))
-#'
-
-tpc <- function (suffStat, indepTest, alpha, labels, p, forbEdges = NULL,
-                 m.max = Inf,
-                 skel.method = c("stable", "stable.parallel"),
-                 conservative = FALSE,
-                 maj.rule = TRUE, ### set this to TRUE
-                 verbose = FALSE,
-                 tiers = NULL, ### new argument
-                 context.all = NULL, ### new argument
-                 context.tier = NULL, ### new argument
-                 numCores = NULL ### new argument
-){
-
-  ### forbEdges: A logical matrix of dimension p*p. If [i,j] is TRUE, then the
-  ###            directed edge i->j is forbidden. If both [i,j] and [j,i] are
-  ###            TRUE, then any type of edge between i and j is forbidden.
-  ###
-  ### tiers:  Numeric vector specifying the tier / time point for each variable.
-  ###         Must be of length 'p', if specified, or have the same length as
-  ###         'labels',if specified. A smaller number corresponds to an earlier
-  ###         tier / time point. Conditional independence testing is restricted
-  ###         such that if x is in tier t(x) and y is in t(y), only those
-  ###         variables are allowed in the conditioning set whose tier is not
-  ###         larger than max(t(x), t(y)).
-  ###
-  ### context.all: Numeric or character vector. Specifies the positions or names of
-  ###         global context variables. Global context variables have no incoming edges, i.e. no
-  ###         parents, and are themselves parents of all non-context variables in the
-  ###         graph.
-  ###
-  ### context.tier: Numeric or character vector. Specifies the positions or names of
-  ###         tier-specific context variables. Tier-specific context variables have
-  ###         no incoming edges, i.e. no parents, and are themselves parents of all
-  ###         non-context variables in the same tier.
 
 
+tpc <- function (suffStat, indepTest, alpha, labels, p,
+                 forbEdges = NULL, m.max = Inf,
+                 conservative = FALSE, maj.rule = TRUE,
+                 tiers = NULL, context.all = NULL, context.tier = NULL,
+                 verbose = FALSE){
 
   cl <- match.call()
   if (!missing(p)) {
-    stopifnot(is.numeric(p), length(p <- as.integer(p)) ==
-                1, p >= 2)
+    stopifnot(is.numeric(p), length(p <- as.integer(p)) == 1, p >= 2)
   }
   if (missing(labels)) {
     if (missing(p))
@@ -216,11 +59,13 @@ tpc <- function (suffStat, indepTest, alpha, labels, p, forbEdges = NULL,
   }
 
   if ( !is.null(context.tier) & !is.null(context.all) ) {
-    if (length(intersect(context.tier, context.all)) > 0) {stop(paste("The following variables are in both 'context.tier' and 'context.all': ", paste(intersect(context.tier, context.all), collapse=",")))}
+    if (length(intersect(context.tier, context.all)) > 0) {
+      stop(paste("The following variables are in both 'context.tier' and 'context.all': ",
+                 paste(intersect(context.tier, context.all), collapse=",")))
+    }
   }
 
-
-  skel.method <- match.arg(skel.method)
+  skel.method <- "stable"
   if (conservative && maj.rule) {
     stop("Choose either conservative PC or majority rule PC!")
   }
@@ -286,7 +131,8 @@ tpc <- function (suffStat, indepTest, alpha, labels, p, forbEdges = NULL,
       print(ConflictList)
     }
 
-    ## matrix of forbidden adjacencies (no type of edge allowed between a and b):
+    ## matrix of forbidden adjacencies (no type of edge allowed between a and
+    ## b):
     forbAdj <- forbEdges * t(forbEdges)
 
     ## modify fixedEdges and fixedGaps according to forbEdges
@@ -296,23 +142,17 @@ tpc <- function (suffStat, indepTest, alpha, labels, p, forbEdges = NULL,
     ## generate list of forbidden arrows (where the other direction is allowed)
     forbArrows <- forbEdges - forbEdges * t(forbEdges)
     forbArrowsL <- which(forbArrows > 0, arr.ind=TRUE)
-    forbArrowList <- lapply(seq_len(nrow(forbArrowsL)), function(i) forbArrowsL[i,])
+    forbArrowList <- lapply(seq_len(nrow(forbArrowsL)),
+                            function(i) forbArrowsL[i,])
   } else {
     forbArrowList <- list()
   }
 
 
-  if (skel.method=="stable.parallel") {
-    if (is.null(numCores)) {stop("Please specify 'numCores'.")}
-    skel <- tskeleton.parallel(suffStat, indepTest, alpha, labels = labels,
-                               method = skel.method, fixedGaps = fixedGaps, fixedEdges = fixedEdges,
-                               m.max = m.max, verbose = verbose, tiers = tiers,
-                               numCores = numCores)
-  } else {
-    skel <- tskeleton(suffStat, indepTest, alpha, labels = labels,
-                      method = skel.method, fixedGaps = fixedGaps, fixedEdges = fixedEdges,
-                      m.max = m.max, verbose = verbose, tiers = tiers)
-  }
+  skel <- tskeleton(suffStat, indepTest, alpha, labels = labels,
+                    method = skel.method, m.max = m.max,
+                    fixedGaps = fixedGaps, fixedEdges = fixedEdges,
+                    tiers = tiers, verbose = verbose)
 
   skel@call <- cl
   if (graph::numEdges(skel@graph) == 0) {
@@ -344,5 +184,6 @@ tpc <- function (suffStat, indepTest, alpha, labels, p, forbEdges = NULL,
   # step IV, Meek's rules
   skelIII <- skelII$sk
   skelIII@graph <- as(gIII, "graphNEL")
-  MeekRules(skelIII, verbose = verbose, unfVect = skelII$unfTripl, solve.confl = TRUE)
+  MeekRules(skelIII, verbose = verbose, unfVect = skelII$unfTripl,
+            solve.confl = TRUE)
 }
