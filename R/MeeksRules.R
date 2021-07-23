@@ -1,61 +1,6 @@
-#' Last tPC Algorithm Step: Apply Meek's rules
-#'
-#' This is a modified version of \code{pcalg::\link[pcalg:udag2pdag]{udag2pdagRelaxed}}.
-#' It applies Meek's rules to the partially oriented DAG obtained after
-#' orienting edges between time points / tiers.
-#'
-#' @param gInput  "pcAlgo"-object containing skeleton and conditional indepedence information.
-#' @param verbose  0: No output; 1: Details
-#' @param unfVect  vector containing numbers that encode ambiguous triples
-#' (as returned by \code{\link{tpc.cons.intern}}). This is needed in the
-#' conservative and majority rule PC algorithms.
-#' @param solve.confl if \code{TRUE}, the orientation rules work with lists for
-#' candidate sets and allow bi-directed edges to resolve conflicting edge
-#' orientations. Note that therefore the resulting object is order-independent
-#' but might not be a PDAG because bi-directed edges can be present.
-#' @param rules Array of length 4 containing \code{TRUE} or \code{FALSE} for
-#' each rule. \code{TRUE} in position i means that rule i (Ri) will be applied.
-#' By default, all rules are used.
-#'
-#' @details If \code{unfVect = NULL} (no ambiguous triples), the three orientation
-#' rules are applied to each eligible structure until no more edges can be oriented.
-#' Otherwise, unfVect contains the numbers of all ambiguous triples in the graph
-#' as determined by \code{\link{tpc.cons.intern}}. Then the orientation rules
-#' take this information into account. For example, if a -> b - c and <a,b,c> is
-#' an unambigous triple and a non-v-structure, then rule 1 implies b -> c. On
-#' the other hand, if a -> b - c but <a,b,c> is an ambiguous triple, then the
-#' edge b - c is not oriented.
-#'
-#' If \code{solve.confl = FALSE}, earlier edge orientations are overwritten by
-#' later ones.
-#'
-#' If \code{solv.confl = TRUE}, both the v-structures and the orientation rules
-#' work with lists for the candidate edges and allow bi-directed edges if there
-#' are conflicting orientations. For example, two v-structures a -> b <- c and
-#' b -> c <- d then yield a -> b <-> c <-d. This option can be used to get an
-#' order-independent version of the PC algorithm (see Colombo and Maathuis (2014)).
-#'
-#' We denote bi-directed edges, for example between two variables i and j,
-#' in the adjacency matrix M of the graph as M[i,j]=2 and M[j,i]=2. Such edges
-#' should be interpreted as indications of conflicts in the algorithm, for
-#' example due to errors in the conditional independence tests or violations of
-#' the faithfulness assumption.
-#'
-#' @return An object of class \code{\link[pcalg]{pcAlgo-class}}
-#'
-#' @references
-#' C. Meek (1995). Causal inference and causal explanation with background
-#' knowledge. In: Proceedings of the Eleventh Conference on Uncertainty in
-#' Artificial Intelligence (UAI-95), pp. 403-411. Morgan Kaufmann Publishers.
-#'
-#' D. Colombo and M.H. Maathuis (2014). Order-independent constraint-based causal
-#' structure learning. Journal of Machine Learning Research 15:3741-3782.
-#'
-#' @author Original code by Markus Kalisch, modifications by Janine Witte.
-#' @export
-#'
-#' @examples
-MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FALSE, rules = rep(TRUE, 4)) {
+
+MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL,
+                       solve.confl = FALSE, rules = rep(TRUE, 4)) {
 
   rule1 <- function(pdag, solve.confl = FALSE, unfVect = NULL) {
     search.pdag <- pdag
@@ -63,18 +8,16 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FA
     for (i in seq_len(nrow(ind))) {
       a <- ind[i, 1]
       b <- ind[i, 2]
-      isC <- which(search.pdag[b, ] == 1 & search.pdag[,
-                                                       b] == 1 & search.pdag[a, ] == 0 & search.pdag[,
-                                                                                                     a] == 0)
+      isC <- which(search.pdag[b, ] == 1 & search.pdag[ ,b] == 1 &
+                     search.pdag[a, ] == 0 & search.pdag[ ,a] == 0)
       if (length(isC) > 0) {
         for (ii in seq_along(isC)) {
           c <- isC[ii]
           if (!solve.confl | (pdag[b, c] == 1 & pdag[c,
                                                      b] == 1)) {
             if (!is.null(unfVect)) {
-              if (!any(unfVect == triple2numb(p, a, b,
-                                              c), na.rm = TRUE) && !any(unfVect ==
-                                                                        triple2numb(p, c, b, a), na.rm = TRUE)) {
+              if (!any(unfVect == triple2numb(p, a, b, c), na.rm = TRUE) &&
+                  !any(unfVect == triple2numb(p, c, b, a), na.rm = TRUE)) {
                 pdag[b, c] <- 1
                 pdag[c, b] <- 0
               }
@@ -92,9 +35,8 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FA
           }
           else if (pdag[b, c] == 0 & pdag[c, b] == 1) {
             if (!is.null(unfVect)) {
-              if (!any(unfVect == triple2numb(p, a, b,
-                                              c), na.rm = TRUE) && !any(unfVect ==
-                                                                        triple2numb(p, c, b, a), na.rm = TRUE)) {
+              if (!any(unfVect == triple2numb(p, a, b, c), na.rm = TRUE) &&
+                  !any(unfVect == triple2numb(p, c, b, a), na.rm = TRUE)) {
                 pdag[b, c] <- 2
                 pdag[c, b] <- 2
                 if (verbose)
@@ -131,9 +73,8 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FA
     for (i in seq_len(nrow(ind))) {
       a <- ind[i, 1]
       b <- ind[i, 2]
-      isC <- which(search.pdag[a, ] == 1 & search.pdag[,
-                                                       a] == 0 & search.pdag[, b] == 1 & search.pdag[b,
-                                                                                                     ] == 0)
+      isC <- which(search.pdag[a, ] == 1 & search.pdag[, a] == 0 &
+                     search.pdag[, b] == 1 & search.pdag[b, ] == 0)
       for (ii in seq_along(isC)) {
         c <- isC[ii]
         if (!solve.confl | (pdag[a, b] == 1 & pdag[b,
@@ -166,9 +107,8 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FA
     for (i in seq_len(nrow(ind))) {
       a <- ind[i, 1]
       b <- ind[i, 2]
-      c <- which(search.pdag[a, ] == 1 & search.pdag[,
-                                                     a] == 1 & search.pdag[, b] == 1 & search.pdag[b,
-                                                                                                   ] == 0)
+      c <- which(search.pdag[a, ] == 1 & search.pdag[, a] == 1 &
+                   search.pdag[, b] == 1 & search.pdag[b, ] == 0)
       if (length(c) >= 2) {
         cmb.C <- combn(c, 2)
         cC1 <- cmb.C[1, ]
@@ -179,9 +119,8 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FA
           if (search.pdag[c1, c2] == 0 && search.pdag[c2,
                                                       c1] == 0) {
             if (!is.null(unfVect)) {
-              if (!any(unfVect == triple2numb(p, c1,
-                                              a, c2), na.rm = TRUE) && !any(unfVect ==
-                                                                            triple2numb(p, c2, a, c1), na.rm = TRUE)) {
+              if (!any(unfVect == triple2numb(p, c1, a, c2), na.rm = TRUE) &&
+                  !any(unfVect == triple2numb(p, c2, a, c1), na.rm = TRUE)) {
                 if (!solve.confl | (pdag[a, b] == 1 &
                                     pdag[b, a] == 1)) {
                   pdag[a, b] <- 1
@@ -236,18 +175,21 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FA
   }
   rule4 <- function(pdag, solve.confl = FALSE, unfVect = NULL) {
     search.pdag <- pdag
-    # find an undirected edge - this will be the left vertical edge in the square
+    # find an undirected edge - this will be the left vertical edge in the
+    # square
     ind <- which(search.pdag == 1 & t(search.pdag) == 1, arr.ind = TRUE)
     for (i in seq_len(nrow(ind))) {
       a <- ind[i, 1]
       b <- ind[i, 2]
-      # find all nodes that share an undirected edge with a and a directed edge with b (c into b)
+      # find all nodes that share an undirected edge with a and a directed edge
+      # with b (c into b)
       c <- which(search.pdag[a, ] == 1 &
                    search.pdag[ ,a] == 1 &
                    search.pdag[ ,b] == 1 &
                    search.pdag[b, ] == 0)
       for (j in seq_along(c)) {
-        # find all nodes that share an undirected edge with a, a directed edge with c (d into c) and no edge with b
+        # find all nodes that share an undirected edge with a, a directed edge
+        # with c (d into c) and no edge with b
         d <- which(search.pdag[a, ] == 1 &
                      search.pdag[ ,a] == 1 &
                      search.pdag[ ,c] == 1 &
@@ -256,36 +198,40 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FA
                      search.pdag[ ,b] ==0)
         for (k in seq_along(d) ) {
           if (!is.null(unfVect)) {
-            # make sure that the upper left v-structure is not ambiguous; if it is ambiguous, go to next pair
+            # make sure that the upper left v-structure is not ambiguous; if it
+            # is ambiguous, go to next pair
             if (!any(unfVect == triple2numb(p, b, a, d), na.rm = TRUE) &&
                 !any(unfVect == triple2numb(p, d, a, b), na.rm = TRUE)) {
               if (!solve.confl | (pdag[a, b] == 1 & pdag[b, a] == 1)) {
-                # i.e. if we ignore conflicts, or if we are about to make the first change to the a-b edge in pdag
+                # i.e. if we ignore conflicts, or if we are about to make the
+                # first change to the a-b edge in pdag
                 # make the edge directed into b in pdag
                 pdag[a, b] <- 1
                 pdag[b, a] <- 0
                 if (!solve.confl)
-                  # if solve.confl is not activated, we can use pdag as the new search.pdag
+                  # if solve.confl is not activated, we can use pdag as the new
+                  # search.pdag
                   search.pdag <- pdag
                 if (verbose)
-                  cat("\nRule 4:", a, "-", b, "<-", c, "<-", d, "and", a, "-", c,
-                      ": ", a, "->", b, "\n")
+                  cat("\nRule 4:", a, "-", b, "<-", c, "<-", d, "and", a, "-",
+                      c, ": ", a, "->", b, "\n")
                 break
               }
               else if (pdag[a, b] == 0 & pdag[b, a] == 1) {
-                # if we checked b-a before and there is now a directed edge from b to a in pdag,
-                # orient as bi-directed
+                # if we checked b-a before and there is now a directed edge from
+                # b to a in pdag, orient as bi-directed
                 pdag[a, b] <- pdag[b, a] <- 2
                 if (verbose)
-                  cat("\nRule 4:", a, "-", b, "<-", c, "<-", d, "and", a, "-", c,
-                      ": ", a, "<->", b, "\n")
+                  cat("\nRule 4:", a, "-", b, "<-", c, "<-", d, "and", a, "-",
+                       c, ": ", a, "<->", b, "\n")
                 break
               }
             }
           }
           else { # i.e. if is.null(unfVect)
             if (!solve.confl | (pdag[a, b] == 1 & pdag[b, a] == 1)) {
-              # i.e. if we ignore conflicts, or if we are about to make the first change to the a-b edge in pdag
+              # i.e. if we ignore conflicts, or if we are about to make the
+              # first change to the a-b edge in pdag
               pdag[a, b] <- 1
               pdag[b, a] <- 0
               if (!solve.confl)
@@ -295,8 +241,8 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL, solve.confl = FA
                     ": ", a, "->", b, "\n")
               break
             } else if (pdag[a, b] == 0 & pdag[b, a] == 1) {
-              # if we checked b-a before and there is now a directed edge from b to a in pdag,
-              # orient as bi-directed
+              # if we checked b-a before and there is now a directed edge from b
+              # to a in pdag, orient as bi-directed
               pdag[a, b] <- pdag[b, a] <- 2
               if (verbose)
                 cat("\nRule 4:", a, "-", b, "<-", c, "<-", d, "and", a, "-", c,
