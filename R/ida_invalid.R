@@ -293,8 +293,6 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
   }
 }
 
-
-#' @export
 prep.graph.ida <- function(graphEst){
   ## graphEst   Estimated invalid graph. Usually obtained by pc.fit@graph, where
   ##            pc.fit is the output of pcalg::pc.
