@@ -17,7 +17,10 @@ this allows the user to forbid one direction of an edge, but allow the other one
 `context.tier` function as whitelists. Variables in `context.all` are glocal context variables; as such, they are
 parents of all other non-context nodes in the graphs (examples are variables encoding batch effect in gene expression data, or 'sex'
 and 'country' in a cohort study). Variables in `context.tier` are tier-specific context variables,
-which are parents of all non-context nodes in the same tier (e.g. 'calender year' if the tiers encode different years). 
+which are parents of all non-context nodes in the same tier (e.g. 'calender year' if the tiers encode different years).
+
+The package also includes a function called `ida_invalid`, which determines possibly valid adjustment sets from a graph
+that is not valid CPDAG or MPDAG.
 
 ## Install
 To install and load this package in R from GitHub, make sure that the `devtools` package is installed and run the following commands:
