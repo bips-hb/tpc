@@ -9,4 +9,4 @@ Description: Constraint-based causal discovery using the PC algorithm while
     when the data were collected in different waves of a cohort study.
 Depends: graph, pcalg, igraph
 Encoding: UTF-8
-LazyData: false
+LazyData: true
