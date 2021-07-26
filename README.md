@@ -20,7 +20,7 @@ and 'country' in a cohort study). Variables in `context.tier` are tier-specific 
 which are parents of all non-context nodes in the same tier (e.g. 'calender year' if the tiers encode different years).
 
 The package also includes a function called `ida_invalid`, which determines possibly valid adjustment sets from a graph
-that is not valid CPDAG or MPDAG.
+that is not a valid CPDAG or MPDAG.
 
 ## Install
 To install and load this package in R from GitHub, make sure that the `devtools` package is installed and run the following commands:
