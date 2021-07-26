@@ -1,8 +1,7 @@
 \name{dat_sim}
 
-\alias{dat_sim, true_sim}
-
-\docType{data}
+\alias{dat_sim}
+\alias{true_sim}
 
 \title{Simulated data with a partial ordering}
 

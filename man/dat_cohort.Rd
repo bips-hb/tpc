@@ -1,6 +1,7 @@
 \name{dat_cohort}
 
-\alias{dat_cohort, true_cohort}
+\alias{dat_cohort}
+\alias{true_cohort}
 
 \title{Simulated cohort data}
 

@@ -1,6 +1,8 @@
 \name{dat_modified}
 
-\alias{dat_cohort_num, dat_cohort_dis, dat_miss}
+\alias{dat_cohort_num}
+\alias{dat_cohort_dis}
+\alias{dat_miss}
 
 \docType{data}
 
