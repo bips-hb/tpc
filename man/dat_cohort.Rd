@@ -1,6 +1,6 @@
 \name{dat_cohort}
 
-\alias{dat_cohort}
+\alias{dat_cohort, true_cohort}
 
 \docType{data}
 
