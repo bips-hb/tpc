@@ -10,7 +10,10 @@
 three waves (t0, t1 and t2). See Andrews et al. (2021) for more information
 on how the data were generated.}
 
-\usage{data("dat_cohort")}
+\usage{
+data("dat_cohort")
+Rgraphviz::plot(true_cohort)
+}
 
 \format{
   A data frame with 5000 observations on 34 variables (10 variables were
@@ -49,4 +52,5 @@ with cohort data. Working paper.
 \examples{
 data("dat_cohort")
 head(dat_cohort)
+Rgraphviz::plot(true_cohort)
 }
