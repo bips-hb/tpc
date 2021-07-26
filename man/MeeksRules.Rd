@@ -21,7 +21,7 @@ MeeksRules(gInput, verbose = FALSE, unfVect = NULL, solve.confl = FALSE,
   \item{verbose}{FALSE: No output; TRUE: Details}
 
   \item{unfVect}{vector containing numbers that encode ambiguous triples (as
-  returned by \code{\link{tpc.cons.intern}}). This is needed in the conservative
+  returned by \code{\link{tpc_cons_intern}}). This is needed in the conservative
   and majority rule PC algorithms.}
 
   \item{solve.confl}{if \code{TRUE}, the orientation rules work with lists for
@@ -37,7 +37,7 @@ MeeksRules(gInput, verbose = FALSE, unfVect = NULL, solve.confl = FALSE,
 \details{If \code{unfVect = NULL} (no ambiguous triples), the four orientation
 rules are applied to each eligible structure until no more edges can be
 oriented. Otherwise, unfVect contains the numbers of all ambiguous triples in
-the graph as determined by \code{\link{tpc.cons.intern}}. Then the orientation
+the graph as determined by \code{\link{tpc_cons_intern}}. Then the orientation
 rules take this information into account. For example, if a -> b - c and <a,b,c>
 is an unambigous triple and a non-v-structure, then rule 1 implies b -> c. On
 the other hand, if a -> b - c but <a,b,c> is an ambiguous triple, then the edge
@@ -69,5 +69,3 @@ D. Colombo and M.H. Maathuis (2014). Order-independent constraint-based causal
 structure learning. Journal of Machine Learning Research 15:3741-3782.}
 
 \author{Original code by Markus Kalisch, modifications by Janine Witte.}
-
-\examples{}
