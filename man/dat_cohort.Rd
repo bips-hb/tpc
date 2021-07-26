@@ -2,8 +2,6 @@
 
 \alias{dat_cohort, true_cohort}
 
-\docType{data}
-
 \title{Simulated cohort data}
 
 \description{Simulated data of a European child-and-youth cohort study with
