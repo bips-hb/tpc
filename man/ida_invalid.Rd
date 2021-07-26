@@ -36,7 +36,8 @@ estimates than determining the parent sets of x.}
 or another causal discovery algorithm is invalid. It determines all local or
 optimal adjustment sets compatible with the invalid graph by trying out all
 possible orientations of undirected edges in relevant parts of the graph while
-ignoring the rest of the graph.}
+ignoring the rest of the graph. Note that \code{ida_invalid} does not have any
+theoretical guarantees.}
 
 \value{A list of adjustment sets compatible with graphEst. 'NULL' stands for
 the empty set. '0' means that the effect is zero (this occurs if y is among the
