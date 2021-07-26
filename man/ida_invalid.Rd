@@ -47,5 +47,32 @@ adjustment).}
 high-dimensional intervention effects from observational data. The Annals of
 Statistics, 37(6A), 3133-3164.}
 
-\examples{}
+\examples{
+## load simulated cohort data
+data(dat_sim)
+n <- nrow(dat_sim)
+lab <- colnames(dat_sim)
 
+## estimate skeleton with temporal ordering as background information
+tiers <- rep(c(1,2,3), times=c(3,3,3))
+tpc.fit <- tpc(suffStat = list(C = cor(dat_sim), n = n),
+              indepTest = gaussCItest, alpha = 0.01, labels = lab,
+              tiers = tiers)
+
+if (require(Rgraphviz)) {
+  ## compare estimated CPDAGs
+  data("true_sim")
+  par(mfrow = c(1,1))
+  plot(tpc.fit2, main = "tPC estimate")
+}
+
+## check if the output is a valid CPDAG or MPDAG
+isValidGraph(as(tpc.fit, "amat"), type="cpdag")
+isValidGraph(as(tpc.fit, "amat"), type="pdag")
+
+## determine possibly valid local adjustment sets for the effect of A1 on B1
+ida_invalid(x.pos = 1, y.pos = 2, graphEst = tpc.fit@graph, method = "local")
+
+## determine possibly valid optimal adjustment sets for the effect of A1 on B3
+ida_invalid(x.pos = 1, y.pos = 8, graphEst = tpc.fit@graph, method = "optimal")
+}

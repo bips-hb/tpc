@@ -4,10 +4,10 @@
 
 \title{Estimate the Skeleton of a DAG while Accounting for a Partial Ordering}
 
-\description{Like \code{pcalg::\link[pcalg]{skelton}}, but takes into account a
-user-specified partial node ordering. The conditional independence between
-\code{x} and \code{y} given \code{S} is not tested if any variable in \code{S}
-lies in the future of both \code{x} and \code{y}.}
+\description{Like \code{pcalg::\link[pcalg]{skeleton}}, but takes a
+user-specified partial node ordering into account. The conditional independence
+between \code{x} and \code{y} given \code{S} is not tested if any variable in
+\code{S} lies in the future of both \code{x} and \code{y}.}
 
 \usage{
 tskeleton(suffStat, indepTest, alpha, labels, p,
@@ -71,7 +71,7 @@ tskeleton(suffStat, indepTest, alpha, labels, p,
 \details{See \code{pcalg::\link[pcalg]{skeleton}} for further information on the
 skeleton algorithm.}
 
-\return{An object of class "pcAlgo" (see \code{pcalg::\link[pcalg]{pcAlgo}})
+\value{An object of class "pcAlgo" (see \code{pcalg::\link[pcalg]{pcAlgo}})
 containing an estimate of the skeleton of the underlying DAG, the conditioning
 sets (sepset) that led to edge removals and several other parameters.}
 
@@ -80,21 +80,28 @@ Diego Colombo. Modifications by Janine Witte.}
 
 
 \examples{
-# load numeric cohort data
-data(dat_cohort_num)
+## load simulated cohort data
+data("dat_sim")
+n <- nrow(dat_sim)
+lab <- colnames(dat_sim)
 
+## estimate skeleton without taking background information into account
+tskel.fit <- tskeleton(suffStat = list(C = cor(dat_sim), n = n),
+                     indepTest = gaussCItest, alpha = 0.01, labels = lab)
+skel.fit <- pcalg::skeleton(suffStat = list(C = cor(dat_sim), n = n),
+                   indepTest = gaussCItest, alpha = 0.01, labels = lab)
+identical(skel.fit@graph, tskel.fit@graph) # TRUE
 
-n <- nrow(gmG8$x)
-V <- colnames(gmG8$x) # labels aka node names
+## estimate skeleton with temporal ordering as background information
+tiers <- rep(c(1,2,3), times=c(3,3,3))
+tskel.fit2 <- tskeleton(suffStat = list(C = cor(dat_sim), n = n),
+                     indepTest = gaussCItest, alpha = 0.01, labels = lab,
+                     tiers = tiers)
 
-## estimate skeleton
-skel.fit <- skeleton(suffStat = list(C = cor(dat_), n = n),
-                     indepTest = mixCItest, alpha = 0.01, labels = V,
-                     verbose = TRUE)
-if (require(Rgraphviz)) {
-  ## show estimated Skeleton
-  par(mfrow=c(1,2))
-  plot(skel.fit, main = "Estimated Skeleton")
-  plot(gmG8$g, main = "True DAG")
-}
+## in this case, the skeletons estimated with and without background knowledge
+## are identical, but fewer conditional independence tests were performed when
+## background knowledge was taken into account
+identical(tskel.fit@graph, tskel.fit2@graph) # TRUE
+tskel.fit@n.edgetests
+tskel.fit2@n.edgetests
 }
