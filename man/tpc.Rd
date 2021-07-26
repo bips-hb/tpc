@@ -99,19 +99,23 @@ data(dat_sim)
 n <- nrow(dat_sim)
 lab <- colnames(dat_sim)
 
-## estimate skeleton without taking background information into account
+## estimate skeleton without taking background
+## information into account
 tpc.fit <- tpc(suffStat = list(C = cor(dat_sim), n = n),
-                     indepTest = gaussCItest, alpha = 0.01, labels = lab)
+               indepTest = gaussCItest, alpha = 0.01,
+               labels = lab)
 pc.fit <- pcalg::pc(suffStat = list(C = cor(dat_sim), n = n),
-                   indepTest = gaussCItest, alpha = 0.01, labels = lab,
+                   indepTest = gaussCItest, alpha = 0.01,
+                   labels = lab,
                    maj.rule = TRUE, solve.conf = TRUE)
 identical(pc.fit@graph, tpc.fit@graph) # TRUE
 
-## estimate skeleton with temporal ordering as background information
+## estimate skeleton with temporal ordering as
+## background information
 tiers <- rep(c(1,2,3), times=c(3,3,3))
 tpc.fit2 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
-                     indepTest = gaussCItest, alpha = 0.01, labels = lab,
-                     tiers = tiers)
+                indepTest = gaussCItest, alpha = 0.01,
+                labels = lab, tiers = tiers)
 
 if (require(Rgraphviz)) {
   ## compare estimated CPDAGs
@@ -122,8 +126,9 @@ if (require(Rgraphviz)) {
   plot(tpc.fit2, main = "tPC estimate")
 }
 
-## require that there is no edge between A1 and A1, and that any edge between
-## A2 and B2 or A2 and C2 is directed away from A2
+## require that there is no edge between A1 and A1, and
+## that any edge between A2 and B2 or A2 and C2 is
+## directed away from A2
 forb <- matrix(FALSE, nrow=9, ncol=9)
 rownames(forb) <- colnames(forb) <- lab
 forb["A1","A3"] <- forb["A3","A1"] <- TRUE
@@ -131,8 +136,9 @@ forb["B2","A2"] <- TRUE
 forb["C2","A2"] <- TRUE
 
 tpc.fit3 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
-                     indepTest = gaussCItest, alpha = 0.01, labels = lab,
-                     forbEdges = forb, tiers = tiers)
+                indepTest = gaussCItest, alpha = 0.01,
+                labels = lab,
+                forbEdges = forb, tiers = tiers)
 
 if (require(Rgraphviz)) {
   ## compare estimated CPDAGs
@@ -142,11 +148,13 @@ if (require(Rgraphviz)) {
   plot(tpc.fit3, main = "new tPC estimate")
 }
 
-## force edge from A1 to all other nodes measured at time 1 into the graph
-## (note that the edge from A1 to A2 is then forbidden)
+## force edge from A1 to all other nodes measured at time 1
+## into the graph (note that the edge from A1 to A2 is then
+## forbidden)
 tpc.fit4 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
-                     indepTest = gaussCItest, alpha = 0.01, labels = lab,
-                     tiers = tiers, context.tier = "A1")
+                indepTest = gaussCItest, alpha = 0.01,
+                labels = lab,
+                tiers = tiers, context.tier = "A1")
 
 if (require(Rgraphviz)) {
   ## compare estimated CPDAGs
@@ -157,8 +165,9 @@ if (require(Rgraphviz)) {
 
 ## force edge from A1 to all other nodes into the graph
 tpc.fit5 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
-                     indepTest = gaussCItest, alpha = 0.01, labels = lab,
-                     tiers = tiers, context.all = "A1")
+                indepTest = gaussCItest, alpha = 0.01,
+                labels = lab,
+                tiers = tiers, context.all = "A1")
 
 if (require(Rgraphviz)) {
   ## compare estimated CPDAGs

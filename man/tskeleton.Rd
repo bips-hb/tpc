@@ -85,22 +85,25 @@ data("dat_sim")
 n <- nrow(dat_sim)
 lab <- colnames(dat_sim)
 
-## estimate skeleton without taking background information into account
+## estimate skeleton without taking background information
+## into account
 tskel.fit <- tskeleton(suffStat = list(C = cor(dat_sim), n = n),
-                     indepTest = gaussCItest, alpha = 0.01, labels = lab)
+             indepTest = gaussCItest, alpha = 0.01, labels = lab)
 skel.fit <- pcalg::skeleton(suffStat = list(C = cor(dat_sim), n = n),
-                   indepTest = gaussCItest, alpha = 0.01, labels = lab)
+            indepTest = gaussCItest, alpha = 0.01, labels = lab)
 identical(skel.fit@graph, tskel.fit@graph) # TRUE
 
-## estimate skeleton with temporal ordering as background information
+## estimate skeleton with temporal ordering as background
+## information
 tiers <- rep(c(1,2,3), times=c(3,3,3))
 tskel.fit2 <- tskeleton(suffStat = list(C = cor(dat_sim), n = n),
-                     indepTest = gaussCItest, alpha = 0.01, labels = lab,
-                     tiers = tiers)
+              indepTest = gaussCItest, alpha = 0.01, labels = lab,
+              tiers = tiers)
 
-## in this case, the skeletons estimated with and without background knowledge
-## are identical, but fewer conditional independence tests were performed when
-## background knowledge was taken into account
+## in this case, the skeletons estimated with and without
+## background knowledge are identical, but fewer conditional
+## independence tests were performed when background
+## knowledge was taken into account
 identical(tskel.fit@graph, tskel.fit2@graph) # TRUE
 tskel.fit@n.edgetests
 tskel.fit2@n.edgetests
