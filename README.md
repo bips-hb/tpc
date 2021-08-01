@@ -22,8 +22,9 @@ which are parents of all non-context nodes in the same tier (e.g. 'calender year
 The package also includes a function called `ida_invalid`, which determines possibly valid adjustment sets from a graph
 that is not a valid CPDAG or MPDAG.
 
-## Install
-To install and load this package in R from GitHub, make sure that the `devtools` package is installed and run the following commands:
+## Installation
+Install `graph` and `RBGL` from Bioconductor and `devtools` from CRAN, and make sure that Rtools40 is installed on your computer.
+Then run the following commands:
 
 ```R
 devtools::install_github("bips-hb/tpc")
