@@ -88,8 +88,7 @@ not considered as candidate colliders or candidate parents of colliders.
 
 \value{
 \item{unfTripl}{numeric vector of triples coded as numbers (via
-\code{pcalg::\link[pcalg:pc_cons_intern]{triple2numb}})
-that were marked as ambiguous.}
+\code{pcalg::triple2numb}) that were marked as ambiguous.}
 
 \item{sk}{The updated skeleton-object (separating sets might have been
 updated).}
