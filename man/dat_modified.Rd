@@ -1,6 +1,5 @@
 \name{dat_modified}
 
-\alias{dat_cohort_num}
 \alias{dat_cohort_dis}
 \alias{dat_miss}
 
@@ -9,13 +8,11 @@
 \title{Modified simulated cohort data}
 
 \description{Modified versions of \code{\link{dat_cohort}}. \code{dat_miss}
-contains missing values. In \code{dat_cohort_num}, factor variables have been
-converted into numerical variables. In \code{dat_cohort_dis}, numerical
+contains missing values. In \code{dat_cohort_dis}, numerical
 variables have been discretised according to the terciles.}
 
 \usage{
 data("dat_miss")
-data("dat_cohort_num")
 data("dat_cohort_dis")
 }
 
@@ -27,9 +24,6 @@ with cohort data. Working paper.
 \examples{
 data("dat_miss")
 head(dat_miss)
-
-data("dat_cohort_num")
-head(dat_cohort_num)
 
 data("dat_cohort_dis")
 head(dat_cohort_dis)
