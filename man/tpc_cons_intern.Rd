@@ -80,7 +80,7 @@ minimise the number of conditional independence tests.
 
 2) Conditional independence testing is restricted such that if x is in tier t(x)
 and y is in t(y), only those variables are allowed in the conditioning set whose
-tier is not larger than max(t(x), t(y)).
+tier is not larger than t(x).
 
 Context variables specified via \code{context.all} or \code{context.tier} are
 not considered as candidate colliders or candidate parents of colliders.

@@ -80,7 +80,7 @@ Specifying a tier for each variable using the \code{tier} argument has the
 following effects: 1) In the skeleton phase and v-structure learing phases,
 conditional independence testing is restricted such that if x is in tier t(x)
 and y is in t(y), only those variables are allowed in the conditioning set whose
-tier is not larger than max(t(x), t(y)). 2) Following the v-structure phase, all
+tier is not larger than t(x). 2) Following the v-structure phase, all
 edges that were found between two tiers are directed into the direction of the
 higher-order tier. If context variables are specified using \code{context.all}
 and/or \code{context.tier}, the corresponding orientations are added in this

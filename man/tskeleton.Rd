@@ -63,7 +63,7 @@ tskeleton(suffStat, indepTest, alpha, labels, p,
   'labels',if specified. A smaller number corresponds to an earlier tier / time
   point. Conditional independence testing is restricted such that if x is in
   tier t(x) and y is in t(y), only those variables are allowed in the
-  conditioning set whose tier is not larger than max(t(x), t(y)).}
+  conditioning set whose tier is not larger than t(x).}
 
   \item{verbose}{if \code{TRUE}, detailed output is provided.}
 }
