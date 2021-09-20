@@ -1,7 +1,7 @@
 Package: tpc
 Type: Package
 Title: Temporal PC Algorithm
-Version: 0.5
+Version: 1.0
 Author: Janine Witte
 Maintainer: Janine Witte <witte@leibniz-bips.de>
 Description: Constraint-based causal discovery using the PC algorithm while
