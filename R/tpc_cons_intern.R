@@ -101,8 +101,8 @@ tpc.cons.intern <- function(
 
         ############################# new code
         # neighbours in the future of both candidate parents are excluded
-        nbrsA <- intersect(nbrsA, which(tiers<=max(tiers[a],tiers[c])))
-        nbrsC <- intersect(nbrsC, which(tiers<=max(tiers[a],tiers[c])))
+        nbrsA <- intersect(nbrsA, which(tiers<=tiers[a]))
+        nbrsC <- intersect(nbrsC, which(tiers<=tiers[c]))
         ############################# end new code
         if (verbose) {
           cat("\nTriple:", a, b, c, "and sepset by skelet:",

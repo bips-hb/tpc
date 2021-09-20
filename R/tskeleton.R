@@ -102,9 +102,9 @@ tskeleton <- function (suffStat, indepTest, alpha, labels, p,
                 G.l[[x]] #
              else G[, x]
              #################################################
-             max_tier <- max(tiers[c(x,y)])
-             # this excludes neighbours in later tiers from the conditioning set
-             nbrsBool[tiers > max_tier] <- FALSE
+             # this excludes neighbours in a later tier than x from the
+             # conditioning set
+             nbrsBool[tiers > tiers[x]] <- FALSE
              #################################################
              nbrsBool[y] <- FALSE
              # nbrs contains the indices of all eligible neighbours
