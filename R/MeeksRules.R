@@ -183,20 +183,20 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL,
       b <- ind[i, 2]
       # find all nodes that share an undirected edge with a and a directed edge
       # with b (c into b)
-      c <- which(search.pdag[a, ] == 1 &
+      all_c <- which(search.pdag[a, ] == 1 & ## !!! ##
                    search.pdag[ ,a] == 1 &
                    search.pdag[ ,b] == 1 &
                    search.pdag[b, ] == 0)
-      for (j in seq_along(c)) {
+      for (c in all_c) { ## !!! ##
         # find all nodes that share an undirected edge with a, a directed edge
         # with c (d into c) and no edge with b
-        d <- which(search.pdag[a, ] == 1 &
+        all_d <- which(search.pdag[a, ] == 1 & ## !!! ##
                      search.pdag[ ,a] == 1 &
                      search.pdag[ ,c] == 1 &
                      search.pdag[c, ] == 0 &
                      search.pdag[b, ] == 0 &
                      search.pdag[ ,b] ==0)
-        for (k in seq_along(d) ) {
+        for (d in all_d) { ## !!! ##
           if (!is.null(unfVect)) {
             # make sure that the upper left v-structure is not ambiguous; if it
             # is ambiguous, go to next pair
