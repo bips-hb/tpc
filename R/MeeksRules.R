@@ -187,7 +187,7 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL,
                    search.pdag[ ,a] == 1 &
                    search.pdag[ ,b] == 1 &
                    search.pdag[b, ] == 0)
-      for (c in c_all) { ## !!! ##
+      for (c in all_c) { ## !!! ##
         # find all nodes that share an undirected edge with a, a directed edge
         # with c (d into c) and no edge with b
         all_d <- which(search.pdag[a, ] == 1 & ## !!! ##
