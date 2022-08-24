@@ -1,0 +1,39 @@
+citHeader("To cite micd in publications, use:")
+
+citEntry(entry = "Article",
+  title        = "Causal discovery of gene regulation with incomplete data",
+  author       = personList(as.person("Ronja Foraita"),
+                   as.person("Juliane Friemel"),
+                   as.person("Kathrin G\\\"unther"),
+                   as.person("Thomas Behrens"),
+                   as.person("J\\\"orn Bullerdiek"),
+                   as.person("Rolf Nimzyk"),
+                   as.person("Wolfgang Ahrens"),
+                   as.person("Vanessa Didelez")),
+  journal      = "Journal of the Royal Statistical Society: Series A (Statistics in Society)",
+  year         = "2020",
+  volume       = "183",
+  number       = "4",
+  pages        = "1747--1775",
+  doi          = "10.1111/rssa.12565",
+  textVersion  =
+  paste("Ronja Foraita, Juliane Friemel, Kathrin Günther, Thomas Behrens, Jörn Bullerdiek, Rolf Nimzyk, Wolfgang Ahrens, Vanessa Didelez (2020).",
+        "Causal discovery of gene regulation with incomplete data.",
+        "Journal of the Royal Statistical Society: Series A (Statistics in Society), 183(4), 1747-1775.")
+)
+
+
+citEntry(entry = "Article",
+  title        = "Multiple imputation and test-wise deletion for causal discovery from incomplete cohort data",
+  author       = personList(as.person("Janine Witte"),
+                   as.person("Ronja Foraita"),
+                   as.person("Vanessa Didelez")),
+  journal      = "Statistics in Medicine",
+  year         = "2022",
+   doi         = "10.1002/sim.9535",
+  textVersion  =
+  paste("Janine Witte, Ronja Foraita, Vanessa Didelez (2022).",
+        "Multiple imputation and test-wise deletion for causal discovery from incomplete cohort data.",
+        "Statistics in Medicine", 
+        "https://doi.org/10.1002/sim.9535")
+)
