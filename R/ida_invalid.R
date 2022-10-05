@@ -1,4 +1,4 @@
-#' IDA adjustment sets with invalid graph
+#' IDA Adjustment Sets with Invalid Graph
 #'
 #' Determines adjustment sets compatible with a partially directed graph that is not a
 #' valid CPDAG or MPDAG.
@@ -33,8 +33,9 @@
 #' @references Maathuis MH, Kalisch M, & Buehlmann P (2009). Estimating high-dimensional
 #' intervention effects from observational data. The Annals of Statistics, 37(6A), 3133-3164.
 #'
-#' @import igraph
 #' @import pcalg
+#' @import igraph
+#' @importFrom graphics legend
 #'
 #' @export
 #'
@@ -50,11 +51,11 @@
 #'                indepTest = gaussCItest, alpha = 0.01, labels = lab,
 #'                tiers = tiers)
 #'
-#' if (require(Rgraphviz)) {
+#' if(require("Rgraphviz", character.only = TRUE, quietly = TRUE)){
 #' # compare estimated CPDAGs
 #'  data("true_sim")
 #'  par(mfrow = c(1,1))
-#'  plot(tpc.fit2, main = "tPC estimate")
+#'  plot(tpc.fit, main = "tPC estimate")
 #'  }
 #'
 #' # check if the output is a valid CPDAG or MPDAG
@@ -62,10 +63,10 @@
 #' isValidGraph(as(tpc.fit, "amat"), type="pdag")
 #'
 #' # determine possibly valid local adjustment sets for the effect of A1 on B1
-#' ida_invalid(x.pos = 1, y.pos = 2, graphEst = tpc.fit@graph, method = "local")
+#' ida_invalid(x.pos = 1, y.pos = 2, graphEst = tpc.fit@graph, method = "local", verbose = TRUE)
 #'
-#' # determine possibly valid optimal adjustment sets for the effect of A1 on B3
-#' ida_invalid(x.pos = 1, y.pos = 8, graphEst = tpc.fit@graph, method = "optimal")
+#' # determine possibly valid optimal adjustment sets for the effect of A1 on A3
+#' ida_invalid(x.pos = 1, y.pos = 7, graphEst = tpc.fit@graph, method = "optimal")
 #'
 
 ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
@@ -79,10 +80,11 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
   stopifnot(x.pos == as.integer(x.pos), y.pos == as.integer(y.pos),
             length(x.pos) == 1, length(y.pos) == 1, x.pos != y.pos)
 
-  if ( verbose ) {
+### 24.08.22
+  # if (verbose) {
     x <- pc.obj$lab[x.pos]
     y <- pc.obj$lab[y.pos]
-  }
+  # }
 
   if ( method == "local" ) {
     ### possible parents of X
@@ -95,19 +97,20 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
     ### ambiguous parents of X
     amPa <- setdiff(possPa, Pa)
 
-    if ( verbose ) {
+### 24.08.22
+    if (verbose){
       cat("The exposure x =", x, "has", length(Pa), "definite parents and",
           length(amPa), "ambiguous parents.\n")
-      if ( length(Pa) > 0 ) {
+      }
+    if (length(Pa) > 0){
         Pa_string <- paste(pc.obj$lab[Pa], collapse=", ")
         Pa_string <- paste("(", Pa_string, ").\n")
-        cat("The definite parents are", Pa_string)
-      }
-      if ( length(amPa) > 0 ) {
+        if(verbose) cat("The definite parents are", Pa_string)
+    }
+    if (length(amPa) > 0){
         amPa_string <- paste(pc.obj$lab[amPa], collapse=", ")
         amPa_string <- paste("(", amPa_string, ").\n")
-        cat("The ambiguous parents are", amPa_string)
-      }
+        if(verbose) cat("The ambiguous parents are", amPa_string)
     }
 
     ### plot subgraph showing all possible parents
@@ -119,14 +122,14 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
       col[names(V(sub)) %in% pc.obj$lab[y.pos]] <- "red"
 
       plot(sub, vertex.color=col)
-      legend('topleft', legend=c("exposure","parents","ambiguous"),
-             pt.bg=c("green", "white", "yellow"), pch=21)
+      graphics::legend('topleft', legend=c("exposure","parents","ambiguous"),
+                       pt.bg=c("green", "white", "yellow"), pch=21)
     }
 
     ### check for directed cycles among the definite parents
     if ( length(Pa) > 1 ) {
       am_dir_Pa <- pc.obj$am_dir[c(Pa,x.pos),c(Pa,x.pos)]
-      ok_Pa <- pcalg:::noCycles(am_dir_Pa)
+      ok_Pa <- noCycles_pcalg(am_dir_Pa)
       if (!ok_Pa) {stop("There is a directed cycle in the relevant part of the graph (x, definite parents). Remove the cycle and try again.")}
     }
 
@@ -134,7 +137,7 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
     ### then zero.
 
     if ( y.pos %in% Pa ) {
-      if ( verbose ) {
+      if (verbose) {
         cat("Since the outcome = ", y, "is among the definite parents, the causal effect of",
             x, "on", y, "is zero.\n")
       }
@@ -146,7 +149,7 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
 
     if(length(amPa) == 0){
       if ( length(Pa) == 0 ) { Pa <- NULL }
-      if ( verbose ) {
+      if (verbose) {
         if ( is.null(Pa) ) {
           cat("The only local adjustment set compatible with graphEst is the empty set.\n")
         } else {
@@ -180,7 +183,7 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
       # 1 = edge from right to left in un_list
       # check if this newly created adjacency matrix contains directed cycles
       am2_dir <- am2 - am2 * t(am2)
-      ok <- pcalg:::noCycles(am2_dir)
+      ok <- noCycles_pcalg(am2_dir)
       if (!ok) {return(NA)}
 
       adj_set <- which(am2_dir[x, ]==1)
@@ -235,27 +238,30 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
     ### all relevant nodes
     rel <- sort(unique(c(possMedNodes, possPaMed, x.pos, y.pos)))
 
-    if ( verbose ) {
+### 24.08.22
+    if (verbose){
       cat("There are", length(MedNodes),
           "definite mediators and", length(amMedNodes),
           "ambiguous mediators of the effect of exposure", x, "on outcome",
-          y, ".\n")
-      if ( length(MedNodes) > 0 ) {
+          y, ".\n")}
+
+    if (length(MedNodes) > 0){
         MedNodes_string <- paste(pc.obj$lab[MedNodes], collapse=", ")
         MedNodes_string <- paste("(", MedNodes_string, ").\n")
-        cat("The definite mediators are", MedNodes_string)
-      }
-      if ( length(amMedNodes) > 0 ) {
+        if(verbose) cat("The definite mediators are", MedNodes_string)
+    }
+    if (length(amMedNodes) > 0){
         amMedNodes_string <- paste(pc.obj$lab[amMedNodes], collapse=", ")
         amMedNodes_string <- paste("(", amMedNodes_string, ").\n")
-        cat("The ambiguous mediators are", amMedNodes_string)
-      }
-      if ( length(possPaMed) > 0 ) {
+        if(verbose) cat("The ambiguous mediators are", amMedNodes_string)
+    }
+    if (length(possPaMed) > 0) {
         possPaMed_string <- paste(pc.obj$lab[possPaMed], collapse=", ")
         possPaMed_string <- paste("(", possPaMed_string, ").\n")
-        cat("Further, the definite and ambiguous mediators have",
-            length(possPaMed), "ambiguous parents:", possPaMed_string)
-      }
+        if(verbose){
+          cat("Further, the definite and ambiguous mediators have",
+              length(possPaMed), "ambiguous parents:", possPaMed_string)
+        }
     }
 
     if ( plot ) {
@@ -274,14 +280,14 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
       col[names(V(sub)) %in% pc.obj$lab[c(x.pos,y.pos)]] <- "green"
 
       plot(sub, vertex.color=col)
-      legend('topleft',
-             legend=c("exp./outc.", "mediators", "parents med./outc.", "ambiguous"),
-             pt.bg=c("green", "gray", "white", "yellow"), pch=21)
+      graphics::legend('topleft',
+                legend=c("exp./outc.", "mediators", "parents med./outc.", "ambiguous"),
+                 pt.bg=c("green", "gray", "white", "yellow"), pch=21)
     }
 
     ### check if there are cycles among the definite mediators
     am_dir_Med <- pc.obj$am_dir[c(MedNodes,x.pos,y.pos),c(MedNodes,x.pos,y.pos)]
-    ok_Med <- pcalg:::noCycles(am_dir_Med)
+    ok_Med <- noCycles_pcalg(am_dir_Med)
     if (!ok_Med) {stop("There is a directed cycle in the relevant part of the graph (x, y, definite mediators). Remove the cycle and try again.")}
 
     ### create list of undirected edges:
@@ -296,7 +302,7 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
         O_set <- 0
       }
 
-      if ( verbose ) {
+      if (verbose) {
         cat("There is 1 optimal adjustment set compatible with graphEst.\n")
       }
 
@@ -324,7 +330,7 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
       # 1 = edge from right to left in un_list
       # check if this newly created adjacency matrix contains directed cycles
       am_dir <- am - am * t(am)
-      ok <- pcalg:::noCycles(am_dir)
+      ok <- noCycles_pcalg(am_dir)
       if (!ok) {return(NA)}
 
       ig2 <- igraph::graph_from_adjacency_matrix(t(am))
@@ -349,18 +355,19 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
     ### remove duplicates
     adj_sets <- unique(adj_sets)
 
-    if ( verbose ) {
-      if ( length(adj_sets)==1 ) {
+    if (verbose){
+      if (length(adj_sets) == 1) {
         cat("There is 1 optimal adjustment set compatible with graphEst.\n")
       } else {
         cat("There are", length(adj_sets),
           "optimal adjustment sets compatible with graphEst.\n")
       }
     }
-
     return(unname(adj_sets))
   }
 }
+
+
 
 prep.graph.ida <- function(graphEst){
   ## graphEst   Estimated invalid graph. Usually obtained by pc.fit@graph, where
@@ -377,7 +384,7 @@ prep.graph.ida <- function(graphEst){
 
   ### check if input is a valid pdag
   if ( isValidGraph(am, type="pdag") ) {
-    warning("The input is a valid pdag! Consider using pcalg::ida instead\n")
+    message("The input is a valid pdag! Consider using pcalg::ida instead\n")
   }
 
   ### convert into an igraph object
@@ -400,4 +407,27 @@ prep.graph.ida <- function(graphEst){
   output <- list(am = am, am_dir = am_dir, dg = dg, ig = ig, ug = ug,
                  am_un_tri = am_un_tri, lab = graphEst@nodes)
   return(output)
+}
+
+
+
+
+
+
+# this is a not exported function from the pcalg package, version 2.7-6.
+noCycles_pcalg <- function (mat)
+{
+  ok <- TRUE
+  for (i in 1:length(mat[1, ])) {
+    pa.i <- which(mat[i, ] != 0 & mat[, i] == 0)
+    if (length(pa.i) != 0) {
+      for (j in 1:length(pa.i)) {
+        pos.anc <- setdiff(possAn(m = mat, x = pa.i[j],
+                                  ds = FALSE, possible = TRUE), pa.i[j])
+        if (i %in% pos.anc)
+          ok <- FALSE
+      }
+    }
+  }
+  ok
 }

@@ -1,4 +1,73 @@
-
+#' Utility for Conservative and Majority Rule in tpc
+#'
+#' Like \code{pcalg::\link[pcalg]{pc.cons.intern}}, but takes into account the
+#' user-specified partial node/variable ordering.
+#'
+#' @param sk A skeleton object as returned from \code{pcalg::\link[pcalg]{skeleton}}.
+#' @param suffStat Sufficient statistic: List containing all relevant elements for
+#' the conditional independence decisions.
+#' @param indepTest Pre-defined \code{\link[base]{function}} for testing conditional
+#' independence. The function is internally called as \code{indepTest(x,y,S,suffStat)},
+#' and tests conditional independence of \code{x} and \code{y} given \code{S}.
+#' Here, \code{x} and \code{y} are variables, and \code{S} is a (possibly empty) vector of
+#' variables (all variables are denoted by their (integer) column positions in the
+#' adjacency matrix). The return value of \code{indepTest} is the p-value of the test for
+#' conditional independence.
+#' @param alpha Significance level for the individual conditional independence tests.
+#' @param version.unf Vector of length two. If \code{version.unf[2]==1}, the inititial
+#' separating set found by the PC/FCI algorithm is added to the set of separating sets;
+#' if \code{version.unf[2]==2}, it is not added. In the latter case, if the set of
+#' separating sets is empty, the triple is marked as unambiguous if \code{version.unf[1]==1},
+#' and as ambiguous if \code{version.unf[1]==2}.
+#' @param maj.rule Logical indicating if the triples are checked for ambiguity using the
+#' majority rule idea, which is less strict than the standard conservative method.
+#' @param forbEdges A logical matrix of dimension \code{p*p}. If \code{[i,j]} is TRUE,
+#' then the directed edge \code{i -> j} is forbidden. If both \code{[i,j]} and \code{[j,i]}
+#' are TRUE, then any type of edge between \code{i} and \code{j} is forbidden.
+#' @param tiers Numeric vector specifying the tier / time point for each variable.
+#' A smaller number corresponds to an earlier tier / time point.
+#' @param context.all Numeric or character vector. Specifies the positions or names
+#' of global context variables. Global context variables have no incoming edges,
+#' i.e. no parents, and are themselves parents of all non-context variables in the graph.
+#' @param context.tier Numeric or character vector. Specifies the positions or names of
+#' tier-specific context variables. Tier-specific context variables have no incoming edges,
+#' i.e. no parents, and are themselves parents of all non-context variables in the same tier.
+#' @param verbose Logical asking for detailed output.
+#'
+#' @details See \code{pcalg::\link[pcalg]{pc.cons.intern}} for further information on the
+#' majority and conservative approaches to learning v-structures.
+#'
+#' Specifying a tier for each variable using the \code{tier} argument has the
+#' following effects:
+#'
+#' 1) Only those triples \code{x-y-z} are considered as potential v-structures that
+#' satisfy \code{t(y)=max(t(x),t(z))}. This allows for three constellations: either \code{y} is
+#' in the same tier as \code{x} and both are later than \code{z}, or \code{y} is in the same tier as z
+#' and both are later than \code{x}, or all three are in the same tier. Triples where \code{y} is
+#' earlier than one or both of \code{x} and \code{z} need not be considered, as \code{y} being a
+#' collider would be against the partial ordering. Triples where \code{y} is later than
+#' both \code{x} and \code{z} will be oriented later in the pc algorithm and are left out here to
+#' minimize the number of conditional independence tests.
+#'
+#' 2) Conditional independence testing is restricted such that if \code{x} is in tier \code{t(x)}
+#' and \code{y} is in \code{t(y)}, only those variables are allowed in the conditioning set whose
+#' tier is not larger than \code{t(x)}.
+#'
+#' Context variables specified via \code{context.all} or \code{context.tier} are
+#' not considered as candidate colliders or candidate parents of colliders.
+#'
+#' @importFrom methods as
+#'
+#' @return
+#' \describe{
+#' \item{unfTripl}{numeric vector of triples coded as numbers (via \code{pcalg::triple2numb})
+#' that were marked as ambiguous.}
+#' \item{sk}{The updated skeleton-object (separating sets might have been updated).}}
+#'
+#' @author Original code by Markus Kalisch and Diego Colombo. Modifications by Janine Witte.
+#'
+#' @export
+#'
 tpc.cons.intern <- function(
   sk, suffStat, indepTest, alpha, version.unf = c(NA, NA),
   maj.rule = FALSE, forbEdges=NULL, tiers=NULL,
@@ -20,7 +89,7 @@ tpc.cons.intern <- function(
     pdag
   }
 
-  g <- as(sk@graph, "matrix")
+  g <- methods::as(sk@graph, "matrix")
   stopifnot(all(g == t(g)))
   p <- as.numeric(dim(g)[1])
   if (is.null(tiers)) { tiers <- rep(1, p) }
@@ -36,7 +105,7 @@ tpc.cons.intern <- function(
     # context varialbes do not need to be considered as potential collider parents
     ind <- ind[!(ind[ ,1] %in% union(context.all, context.tier)), ,drop=FALSE]
 
-    tripleMatrix <- matrix( , nrow=0, ncol=4)
+    tripleMatrix <- matrix(NA , nrow=0, ncol=4)
     # go through all edges until tripleMatrix contains all unshielded triples
     for (i in seq_len(nrow(ind))) {
       a <- ind[i, 1] # candidate 'left-hand' parent of collider
@@ -146,7 +215,7 @@ tpc.cons.intern <- function(
         z <- tripleMatrix[i,3]
         pdag <- orientConflictCollider(pdag, x, y, z)
       }
-      sk@graph <- as(pdag, "graphNEL")
+      sk@graph <- methods::as(pdag, "graphNEL")
     }
     ############################# end new code
   }

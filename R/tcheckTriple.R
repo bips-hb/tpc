@@ -1,4 +1,29 @@
-
+#' Check Consistency of Conditional Independence for a Triple of Nodes in a tPC
+#'
+#' @param a (integer) position in adjacency matrix for nodes a.
+#' @param b (integer) position in adjacency matrix for nodes b.
+#' @param c (integer) position in adjacency matrix for nodes c.
+#' @param nbrsA (integer) position in adjacency matrix for neighbors of a.
+#' @param nbrsC (integer) position in adjacency matrix for neighbors of c.
+#' @param sepsetA vector containing \code{Sepset(a,c)}.
+#' @param sepsetC vector containing \code{Sepset(c,a)}.
+#' @param suffStat a list of sufficient statistics for independent tests; see, e.g., [pcalg::pc()].
+#' @param indepTest a function for the independence test, see, e.g., [pcalg::pc()].
+#' @param alpha significance level of test.
+#' @param version.unf Vector of length two. If \code{version.unf[2]==1}, the inititial
+#' separating set found by the PC/FCI algorithm is added to the set of separating sets;
+#' if \code{version.unf[2]==2}, it is not added. In the latter case, if the set of
+#' separating sets is empty, the triple is marked as unambiguous if \code{version.unf[1]==1},
+#' and as ambiguous if \code{version.unf[1]==2}.
+#' @param maj.rule Logical indicating if the triples are checked for ambiguity using the
+#' majority rule idea, which is less strict than the standard conservative method.
+#' @param verbose Logical asking for detailed output.
+#' @param NAdelete logical needed for the case \code{indepTest(*)} returns \code{NA}.
+#' If it is true, the corresponding edge is deleted, otherwise not.
+#'
+#' @return A list.
+#' @noRd
+#'
 tcheckTriple <- function (a, b, c, nbrsA, nbrsC, sepsetA, sepsetC, suffStat,
           indepTest, alpha, version.unf = c(NA, NA), maj.rule = FALSE,
           verbose = FALSE, NAdelete=TRUE) {

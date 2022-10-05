@@ -1,3 +1,88 @@
+#' Estimate the Skeleton of a DAG while Accounting for a Partial Ordering
+#'
+#' Like \code{pcalg::\link[pcalg]{skeleton}}, but takes a user-specified partial node
+#' ordering into account. The conditional independence
+#' between \code{x} and \code{y} given \code{S} is not tested if any variable in
+#' \code{S} lies in the future of both \code{x} and \code{y}.
+#'
+#' @param suffStat A list of sufficient statistics, containing all necessary elements for
+#' the conditional independence decisions in the function \code{indepTest}.
+#' @param indepTest Predefined \code{\link[base]{function}} for testing conditional
+#' independence. It is internally called as \code{indepTest(x,y,S,suffStat)}, and tests
+#' conditional independence of \code{x} and \code{y} given \code{S}. Here, \code{x} and
+#' \code{y} are variables, and \code{S} is a (possibly empty) vector of variables (all
+#' variables are denoted by their (integer) column positions in the adjacency matrix).
+#' \code{suffStat} is a list, see the argument above. The return value of \code{indepTest}
+#' is the p-value of the test for conditional independence.
+#' @param alpha Significance level (number in \emph{(0,1)} for the individual conditional
+#' independence tests.
+#' @param labels (optional) character vector of variable (or "node") names.
+#' Typically preferred to specifying \code{p}.
+#' @param p (optional) number of variables (or nodes). May be specified if \code{labels}
+#' are not, in which case \code{labels} is set to \code{1:p}.
+#' @param method Character string specifying method; the default, "stable" provides an
+#' \emph{order-independent} skeleton, see 'Details' below.
+#' @param m.max Maximal size of the conditioning sets that are considered in the
+#' conditional independence tests.
+#' @param fixedGaps logical \emph{symmetric} matrix of dimension \code{p*p}. If entry
+#' \code{[i,j]} is true, the edge \emph{i-j} is removed before starting the
+#' algorithm. Therefore, this edge is guaranteed to be \emph{absent} in the
+#' resulting graph.
+#' @param fixedEdges a logical \emph{symmetric} matrix of dimension \code{p*p}. If entry
+#' \code{[i,j]} is true, the edge \emph{i-j} is never considered for removal.
+#' Therefore, this edge is guaranteed to be \emph{present} in the resulting graph.
+#' @param NAdelete logical needed for the case \code{indepTest(*)} returns \code{NA}.
+#' If it is true, the corresponding edge is deleted, otherwise not.
+#' @param tiers Numeric vector specifying the tier / time point for each variable.
+#' Must be of length 'p', if specified, or have the same length as 'labels', if specified.
+#' A smaller number corresponds to an earlier tier / time point. Conditional independence
+#' testing is restricted such that if \code{x} is in tier \code{t(x)} and \code{y} is
+#' in \code{t(y)}, only those variables are allowed in the conditioning set whose tier is
+#' not larger than \code{t(x)}.
+#' @param verbose if \code{TRUE}, detailed output is provided.
+#'
+#' @details See \code{pcalg::\link[pcalg]{skeleton}} for further information on the
+#' skeleton algorithm.
+#'
+#' @return An object of class "pcAlgo" (see \code{pcalg::\link[pcalg]{pcAlgo}})
+#' containing an estimate of the skeleton of the underlying DAG, the conditioning
+#' sets (sepset) that led to edge removals and several other parameters.
+#'
+#' @author
+#' Original code by Markus Kalisch, Martin Maechler, Alain Hauser and Diego Colombo.
+#' Modifications by Janine Witte.
+#'
+#' @importFrom methods as new
+#'
+#' @export
+#'
+#' @examples
+#' # load simulated cohort data
+#' data("dat_sim")
+#' n <- nrow(dat_sim)
+#' lab <- colnames(dat_sim)
+#' # estimate skeleton without taking background information into account
+#' tskel.fit <- tskeleton(suffStat = list(C = cor(dat_sim), n = n),
+#'                        indepTest = gaussCItest, alpha = 0.01, labels = lab)
+#' skel.fit <- pcalg::skeleton(suffStat = list(C = cor(dat_sim), n = n),
+#'                             indepTest = gaussCItest, alpha = 0.01, labels = lab)
+#'                             identical(skel.fit@graph, tskel.fit@graph) # TRUE
+#'
+#'# estimate skeleton with temporal ordering as background information
+#' tiers <- rep(c(1,2,3), times=c(3,3,3))
+#' tskel.fit2 <- tskeleton(suffStat = list(C = cor(dat_sim), n = n),
+#'                        indepTest = gaussCItest, alpha = 0.01, labels = lab, tiers = tiers)
+#'
+#' # in this case, the skeletons estimated with and without
+#' # background knowledge are identical, but fewer conditional
+#' # independence tests were performed when background
+#' # knowledge was taken into account
+#' identical(tskel.fit@graph, tskel.fit2@graph) # TRUE
+#' tskel.fit@n.edgetests
+#' tskel.fit2@n.edgetests
+#'
+#'
+
 tskeleton <- function (suffStat, indepTest, alpha, labels, p,
                        method = c("stable", "original"), m.max = Inf,
                        fixedGaps = NULL, fixedEdges = NULL, NAdelete = TRUE,
@@ -156,12 +241,12 @@ tskeleton <- function (suffStat, indepTest, alpha, labels, p,
        for (j in 2:p) pMax[i, j] <- pMax[j, i] <- max(pMax[i, j], pMax[j, i])
     }
    Gobject <- if (sum(G) == 0) {
-      new("graphNEL", nodes = labels)
+      methods::new("graphNEL", nodes = labels)
    } else {
       colnames(G) <- rownames(G) <- labels
-      as(G, "graphNEL")
+      methods::as(G, "graphNEL")
    }
-   new("pcAlgo", graph = Gobject, call = cl, n = integer(0),
+   methods::new("pcAlgo", graph = Gobject, call = cl, n = integer(0),
        max.ord = as.integer(ord - 1), n.edgetests = n.edgetests,
        sepset = sepset, pMax = pMax, zMin = matrix(NA, 1, 1))
 }

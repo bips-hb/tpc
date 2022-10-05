@@ -67,6 +67,7 @@
 #' Modifications by Janine Witte.
 #'
 #' @importFrom graph numEdges
+#' @importFrom methods as
 #' @import pcalg
 
 #' @export
@@ -93,8 +94,7 @@
 #'                 indepTest = gaussCItest, alpha = 0.01, labels = lab, tiers = tiers,
 #'                 skel.method = "stable.parallel", numCores = 2)
 #'
-#' if (require(Rgraphviz)) {
-#'  # compare estimated CPDAGs
+#' if(require("Rgraphviz", character.only = TRUE, quietly = TRUE)){
 #'  data("true_sim")
 #'  par(mfrow = c(1,3))
 #'  plot(true_sim, main = "True DAG")
@@ -145,6 +145,7 @@
 #'  data("true_sim")
 #'  par(mfrow = c(1,1))
 #'  plot(tpc.fit5, main = "alternative tPC estimate")
+#'  }
 #'
 tpc <- function (suffStat, indepTest, alpha, labels, p,
                  skel.method = c("stable", "stable.parallel"),
@@ -330,7 +331,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
                             forbEdges = forbEdges)
 
   ## step III, orientation of edges between tiers:
-  gIII <- as(skelII$sk@graph, "matrix")
+  gIII <- methods::as(skelII$sk@graph, "matrix")
   for (t in unique(tiers)) {
     gIII[tiers>t, tiers==t] <- 0
   }
@@ -349,7 +350,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
 
   # step IV, Meek's rules
   skelIII <- skelII$sk
-  skelIII@graph <- as(gIII, "graphNEL")
+  skelIII@graph <- methods::as(gIII, "graphNEL")
   MeekRules(skelIII, verbose = verbose, unfVect = skelII$unfTripl,
             solve.confl = TRUE)
 }
