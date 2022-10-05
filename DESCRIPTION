@@ -12,7 +12,7 @@ Description: Constraint-based causal discovery using the PC algorithm while
     accounting for a partial node ordering, e.g. a partial temporal ordering
     when the data were collected in different waves of a cohort study.
 Depends: pcalg, igraph
-Imports: graph
+Imports: graph, parallel
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.0

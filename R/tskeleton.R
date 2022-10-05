@@ -1,4 +1,3 @@
-
 tskeleton <- function (suffStat, indepTest, alpha, labels, p,
                        method = c("stable", "original"), m.max = Inf,
                        fixedGaps = NULL, fixedEdges = NULL, NAdelete = TRUE,

@@ -22,6 +22,9 @@
 #' Typically preferred to specifying \code{p}.
 #' @param p (optional) number of variables (or nodes). May be specified if \code{labels}
 #' are not, in which case \code{labels} is set to \code{1:p}.
+#' @param skel.method Character string specifying method; the default, "stable" provides
+#' an order-independent skeleton, see [tpc::tskeleton()].
+#' @param numCores The numbers of CPU cores to be used.
 #' @param forbEdges A logical matrix of dimension p*p. If \code{[i,j]} is TRUE, then the
 #' directed edge i->j is forbidden. If both \code{[i,j]} and \code{[j,i]} are TRUE, then any type of
 #' edge between i and j is forbidden.
@@ -86,6 +89,10 @@
 #' tpc.fit2 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
 #'                 indepTest = gaussCItest, alpha = 0.01, labels = lab, tiers = tiers)
 #'
+#' tpc.fit3 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
+#'                 indepTest = gaussCItest, alpha = 0.01, labels = lab, tiers = tiers,
+#'                 skel.method = "stable.parallel", numCores = 2)
+#'
 #' if (require(Rgraphviz)) {
 #'  # compare estimated CPDAGs
 #'  data("true_sim")
@@ -140,9 +147,11 @@
 #'  plot(tpc.fit5, main = "alternative tPC estimate")
 #'
 tpc <- function (suffStat, indepTest, alpha, labels, p,
+                 skel.method = c("stable", "stable.parallel"),
                  forbEdges = NULL, m.max = Inf,
                  conservative = FALSE, maj.rule = TRUE,
                  tiers = NULL, context.all = NULL, context.tier = NULL,
+                 numCores = NULL,
                  verbose = FALSE){
 
   cl <- match.call()
@@ -204,7 +213,6 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
     }
   }
 
-  skel.method <- "stable"
   if (conservative && maj.rule) {
     stop("Choose either conservative PC or majority rule PC!")
   }
@@ -243,8 +251,6 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
       fixedGaps[tiers!=k,i] <- TRUE
     }
   }
-
-
 
   if (!is.null(forbEdges)) {
 
@@ -287,13 +293,34 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
     forbArrowList <- list()
   }
 
+  # skel.method <- "stable"
+  skel.method <- match.arg(skel.method)
 
-  skel <- tskeleton(suffStat, indepTest, alpha, labels = labels,
-                    method = skel.method, m.max = m.max,
-                    fixedGaps = fixedGaps, fixedEdges = fixedEdges,
-                    tiers = tiers, verbose = verbose)
+  # skel <- tskeleton(suffStat, indepTest, alpha, labels = labels,
+  #                   method = skel.method, m.max = m.max,
+  #                   fixedGaps = fixedGaps, fixedEdges = fixedEdges,
+  #                   tiers = tiers, verbose = verbose)
+  #
+  # skel@call <- cl
+
+  if (skel.method == "stable.parallel") {
+    if (is.null(numCores)) {stop("Please specify 'numCores'.")}
+    skel <- tskeleton_parallel(suffStat, indepTest, alpha, labels = labels,
+                               method = skel.method,
+                               fixedGaps = fixedGaps,
+                               fixedEdges = fixedEdges,
+                               tiers = tiers,
+                               m.max = m.max, verbose = verbose,
+                               numCores = numCores)
+  } else {
+    skel <- tskeleton(suffStat, indepTest, alpha, labels = labels,
+                      method = skel.method, fixedGaps = fixedGaps, fixedEdges = fixedEdges,
+                      m.max = m.max, verbose = verbose, tiers = tiers)
+  }
 
   skel@call <- cl
+
+
   if (graph::numEdges(skel@graph) == 0) {
     return(skel)
   }
