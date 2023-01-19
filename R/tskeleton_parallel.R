@@ -1,6 +1,5 @@
-#' @importFrom parallel makeCluster stopCluster
-#' @import pcalg
-
+#' @keywords internal
+#' @inheritParams <tpc::tskeleton>
 tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
                         method = c("stable.parallel"),
                         numCores,
@@ -96,7 +95,7 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
     clusterEvalQ(workers, {
          library(pcalg)
          library(micd)
-         library(tpc)
+         #library(tpc)
          library(Rfast)})
 
 

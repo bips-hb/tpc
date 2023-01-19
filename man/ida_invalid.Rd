@@ -9,17 +9,14 @@ ida_invalid(x.pos, y.pos, graphEst, method = NULL, verbose = TRUE, plot = TRUE)
 \arguments{
 \item{x.pos}{Position of exposure variable in `graphEst@nodes`.}
 
-\item{y.pos}{Position of outcome varialbe in `graphEst@nodes`.}
+\item{y.pos}{Position of outcome variable in `graphEst@nodes`.}
 
 \item{graphEst}{Estimated invalid partially directed graph. Usually obtained by
 `pc.fit@graph`, where \code{pc.fit} is the output of [pcalg::pc()].}
 
 \item{method}{Character string specifying the method.
 \code{"local"}: returns all compatible parent sets of x.
-\code{"optimal"}: returns all compatible optimal adjustment sets relative to \code{(x,y)}.
-Adjustment for the optimal adjustment set is often more efficient, but determining the
-optimal adjustment sets is more sensitive to faulty graph estimates than determining
-the parent sets of x.}
+\code{"optimal"}: returns all compatible optimal adjustment sets relative to \code{(x,y)}.}
 
 \item{verbose}{Logical. If TRUE, details are printed to the console.}
 
@@ -42,8 +39,13 @@ The IDA algorithm (Maathuis et al. 2019, implemented as
 or another causal discovery algorithm is invalid. It determines all local or
 optimal adjustment sets compatible with the invalid graph by trying out all
 possible orientations of undirected edges in relevant parts of the graph while
-ignoring the rest of the graph. Note that \code{ida_invalid} does not have any
-theoretical guarantees.
+ignoring the rest of the graph.
+
+Adjustment for the optimal adjustment set is often more efficient, but determining the
+optimal adjustment sets is more sensitive to faulty graph estimates than determining
+the parent sets of x.
+
+Note that \code{ida_invalid} does not have any theoretical guarantees.
 }
 \examples{
 # load simulated cohort data
@@ -52,7 +54,7 @@ n <- nrow(dat_sim)
 lab <- colnames(dat_sim)
 
 # estimate skeleton with temporal ordering as background information
-tiers <- rep(c(1,2,3), times=c(3,3,3))
+tiers <- rep(c(1,2,3), times = c(3,3,3))
 tpc.fit <- tpc(suffStat = list(C = cor(dat_sim), n = n),
                indepTest = gaussCItest, alpha = 0.01, labels = lab,
                tiers = tiers)
@@ -70,10 +72,11 @@ isValidGraph(as(tpc.fit, "amat"), type="pdag")
 
 # determine possibly valid local adjustment sets for the effect of A1 on B1
 ida_invalid(x.pos = 1, y.pos = 2, graphEst = tpc.fit@graph, method = "local", verbose = TRUE)
+pcalg::ida(x.pos = 1, y.pos = 2, mcov = cor(dat_sim), graphEst = tpc.fit@graph,
+           method = "local", type = "pdag")
 
 # determine possibly valid optimal adjustment sets for the effect of A1 on A3
 ida_invalid(x.pos = 1, y.pos = 7, graphEst = tpc.fit@graph, method = "optimal")
-
 }
 \references{
 Maathuis MH, Kalisch M, & Buehlmann P (2009). Estimating high-dimensional

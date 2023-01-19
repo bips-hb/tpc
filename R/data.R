@@ -50,7 +50,127 @@
 #' @references Andrews RM, Foraita R, Witte J (2021). A practical guide to causal discovery
 #' with cohort data. <https://doi.org/10.48550/arXiv.2108.13395>
 #'
+#' @seealso [tpc::dat_cohort_dis()], [tpc::dat_cohort_mis()]
+#'
 "dat_cohort"
+
+
+
+#' Simulated Cohort Data - discretized
+#'
+#' Data from \code{\link{dat_cohort}} for which all continuous variables have been
+#' categorized into three categories.
+#'
+#' @format A data frame with 5000 observations and 34 variables (10 variables were
+#' measured at three time points each, denoted as "_t0", "_t1" and "_t2").
+#' \describe{
+#'   \item{sex}{Sex. Factor variable with levels "male" and "female".}
+#'   \item{country}{Country of residence. Factor variable with levels "ITA", "EST", "CYP",
+#'   "BEL", "SWE", "GER", "HUN" and "ESP".}
+#'   \item{fto}{Genotype of one SNP located in the FTO gene. Factor variable with levels
+#'   "TT", "AT", "AA".}
+#'   \item{birth_weight}{Birth weight in grams (numeric).}
+#'   \item{age_t0}{Age in years at survey 't0' (numeric).}
+#'   \item{age_t1}{Age in years at survey 't1' (numeric).}
+#'   \item{age_t2}{Age in years at survey 't2' (numeric).}
+#'   \item{bmi_t0}{Body mass index z-score adjusted for sex and age at survey 't0' (numeric).}
+#'   \item{bmi_t1}{Body mass index z-score adjusted for sex and age at survey 't1' (numeric).}
+#'   \item{bmi_t2}{Body mass index z-score adjusted for sex and age at survey 't2' (numeric).}
+#'   \item{bodyfat_t0}{Per cent body fat measured at survey 't0' (numeric).}
+#'   \item{bodyfat_t1}{Per cent body fat measured at survey 't1' (numeric).}
+#'   \item{bodyfat_t2}{Per cent body fat measured at survey 't2' (numeric).}
+#'   \item{education_t0}{Educational level at survey 't0'. Factor variable with levels "low education",
+#'   "medium education" and "high education".}
+#'   \item{education_t1}{Educational level at survey 't1'. Factor variable with levels "low education",
+#'   "medium education" and "high education".}
+#'   \item{education_t2}{Educational level at survey 't2'. Factor variable with levels "low education",
+#'   "medium education" and "high education".}
+#'   \item{fiber_t0}{Fiber intake in log(mg/kcal) at survey 't0' (numeric).}
+#'   \item{fiber_t1}{Fiber intake in log(mg/kcal) at survey 't1' (numeric).}
+#'   \item{fiber_t2}{Fiber intake in log(mg/kcal) at survey 't2' (numeric).}
+#'   \item{media_devices_t0}{Number of audiovisual media in the child's bedroom at survey 't0' (numeric).}
+#'   \item{media_devices_t1}{Number of audiovisual media in the child's bedroom at survey 't1' (numeric).}
+#'   \item{media_devices_t2}{Number of audiovisual media in the child's bedroom at survey 't2' (numeric).}
+#'   \item{media_time_t0}{Use of audiovisual media in log(h/week+1) at survey 't0' (numeric)}
+#'   \item{media_time_t1}{Use of audiovisual media in log(h/week+1) at survey 't1' (numeric)}
+#'   \item{media_time_t2}{Use of audiovisual media in log(h/week+1) at survey 't2' (numeric)}
+#'   \item{mvpa_t0}{Moderate to vigorous physical activity in sqrt(min/day) at survey 't0' (numeric).}
+#'   \item{mvpa_t1}{Moderate to vigorous physical activity in sqrt(min/day) at survey 't1' (numeric).}
+#'   \item{mvpa_t2}{Moderate to vigorous physical activity in sqrt(min/day) at survey 't2' (numeric).}
+#'   \item{sugar_t0}{Square root of sugar intake score at survey 't0' (numeric).}
+#'   \item{sugar_t1}{Square root of sugar intake score at survey 't1' (numeric).}
+#'   \item{sugar_t2}{Square root of sugar intake score at survey 't2' (numeric).}
+#'   \item{wellbeing_t0}{Box-Cox-transformed well-being score at survey 't0' (numeric).}
+#'   \item{wellbeing_t1}{Box-Cox-transformed well-being score at survey 't1' (numeric).}
+#'   \item{wellbeing_t2}{Box-Cox-transformed well-being score at survey 't2' (numeric).}
+#' }
+#' @references Andrews RM, Foraita R, Witte J (2021). A practical guide to causal discovery
+#' with cohort data. <https://doi.org/10.48550/arXiv.2108.13395>
+#'
+#' @seealso [tpc::dat_cohort()], [tpc::dat_cohort_mis()]
+#'
+"dat_cohort_dis"
+
+
+
+
+#' Simulated Cohort Data - with missing values
+#'
+#' Data from \code{\link{dat_cohort}} with missing values.
+#'
+#' @format A data frame with 5000 observations and 34 variables (10 variables were
+#' measured at three time points each, denoted as "_t0", "_t1" and "_t2").
+#' \describe{
+#'   \item{sex}{Sex. Factor variable with levels "male" and "female".}
+#'   \item{country}{Country of residence. Factor variable with levels "ITA", "EST", "CYP",
+#'   "BEL", "SWE", "GER", "HUN" and "ESP".}
+#'   \item{fto}{Genotype of one SNP located in the FTO gene. Ordinal variable with levels
+#'   "TT", "AT", "AA".}
+#'   \item{birth_weight}{Birth weight in grams (numeric).}
+#'   \item{age_t0}{Age in years at survey 't0' (numeric).}
+#'   \item{age_t1}{Age in years at survey 't1' (numeric).}
+#'   \item{age_t2}{Age in years at survey 't2' (numeric).}
+#'   \item{bmi_t0}{Body mass index z-score adjusted for sex and age at survey 't0' (numeric).}
+#'   \item{bmi_t1}{Body mass index z-score adjusted for sex and age at survey 't1' (numeric).}
+#'   \item{bmi_t2}{Body mass index z-score adjusted for sex and age at survey 't2' (numeric).}
+#'   \item{bodyfat_t0}{Per cent body fat measured at survey 't0' (numeric).}
+#'   \item{bodyfat_t1}{Per cent body fat measured at survey 't1' (numeric).}
+#'   \item{bodyfat_t2}{Per cent body fat measured at survey 't2' (numeric).}
+#'   \item{education_t0}{Educational level at survey 't0'. Ordinal variable with levels "low education",
+#'   "medium education" and "high education".}
+#'   \item{education_t1}{Educational level at survey 't1'. Ordinal variable with levels "low education",
+#'   "medium education" and "high education".}
+#'   \item{education_t2}{Educational level at survey 't2'. Ordinal variable with levels "low education",
+#'   "medium education" and "high education".}
+#'   \item{fiber_t0}{Fiber intake in log(mg/kcal) at survey 't0' (numeric).}
+#'   \item{fiber_t1}{Fiber intake in log(mg/kcal) at survey 't1' (numeric).}
+#'   \item{fiber_t2}{Fiber intake in log(mg/kcal) at survey 't2' (numeric).}
+#'   \item{media_devices_t0}{Number of audiovisual media in the child's bedroom at survey 't0' (numeric).}
+#'   \item{media_devices_t1}{Number of audiovisual media in the child's bedroom at survey 't1' (numeric).}
+#'   \item{media_devices_t2}{Number of audiovisual media in the child's bedroom at survey 't2' (numeric).}
+#'   \item{media_time_t0}{Use of audiovisual media in log(h/week+1) at survey 't0' (numeric)}
+#'   \item{media_time_t1}{Use of audiovisual media in log(h/week+1) at survey 't1' (numeric)}
+#'   \item{media_time_t2}{Use of audiovisual media in log(h/week+1) at survey 't2' (numeric)}
+#'   \item{mvpa_t0}{Moderate to vigorous physical activity in sqrt(min/day) at survey 't0' (numeric).}
+#'   \item{mvpa_t1}{Moderate to vigorous physical activity in sqrt(min/day) at survey 't1' (numeric).}
+#'   \item{mvpa_t2}{Moderate to vigorous physical activity in sqrt(min/day) at survey 't2' (numeric).}
+#'   \item{sugar_t0}{Square root of sugar intake score at survey 't0' (numeric).}
+#'   \item{sugar_t1}{Square root of sugar intake score at survey 't1' (numeric).}
+#'   \item{sugar_t2}{Square root of sugar intake score at survey 't2' (numeric).}
+#'   \item{wellbeing_t0}{Box-Cox-transformed well-being score at survey 't0' (numeric).}
+#'   \item{wellbeing_t1}{Box-Cox-transformed well-being score at survey 't1' (numeric).}
+#'   \item{wellbeing_t2}{Box-Cox-transformed well-being score at survey 't2' (numeric).}
+#' }
+#' @references Andrews RM, Foraita R, Witte J (2021). A practical guide to causal discovery
+#' with cohort data. <https://doi.org/10.48550/arXiv.2108.13395>
+#'
+#' @seealso [tpc::dat_cohort()], [tpc::dat_cohort_dis()]
+#'
+"dat_cohort_mis"
+
+
+
+
 
 
 

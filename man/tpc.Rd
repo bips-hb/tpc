@@ -10,6 +10,7 @@ tpc(
   alpha,
   labels,
   p,
+  skel.method = c("stable", "stable.parallel"),
   forbEdges = NULL,
   m.max = Inf,
   conservative = FALSE,
@@ -17,6 +18,7 @@ tpc(
   tiers = NULL,
   context.all = NULL,
   context.tier = NULL,
+  numCores = NULL,
   verbose = FALSE
 )
 }
@@ -40,6 +42,9 @@ Typically preferred to specifying \code{p}.}
 
 \item{p}{(optional) number of variables (or nodes). May be specified if \code{labels}
 are not, in which case \code{labels} is set to \code{1:p}.}
+
+\item{skel.method}{Character string specifying method; the default, "stable" provides
+an order-independent skeleton, see [tpc::tskeleton()].}
 
 \item{forbEdges}{A logical matrix of dimension p*p. If \code{[i,j]} is TRUE, then the
 directed edge i->j is forbidden. If both \code{[i,j]} and \code{[j,i]} are TRUE, then any type of
@@ -66,6 +71,8 @@ no parents, and are themselves parents of all non-context variables in the graph
 names of tier-specific context variables. Tier-specific context variables have no
 incoming edges, i.e. no parents, and are themselves parents of all non-context variables
 in the same tier.}
+
+\item{numCores}{The numbers of CPU cores to be used.}
 
 \item{verbose}{if \code{TRUE}, detailed output is provided.}
 }
@@ -114,8 +121,11 @@ tiers <- rep(c(1,2,3), times=c(3,3,3))
 tpc.fit2 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
                 indepTest = gaussCItest, alpha = 0.01, labels = lab, tiers = tiers)
 
+tpc.fit3 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
+                indepTest = gaussCItest, alpha = 0.01, labels = lab, tiers = tiers,
+                skel.method = "stable.parallel", numCores = 2)
+
 if(require("Rgraphviz", character.only = TRUE, quietly = TRUE)){
- # compare estimated CPDAGs
  data("true_sim")
  par(mfrow = c(1,3))
  plot(true_sim, main = "True DAG")
