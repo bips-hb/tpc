@@ -7,7 +7,7 @@ Authors@R: c(
              email = "witte@leibniz-bips.de", role = c("aut", "cph", "cre")),
       person(given = "Ronja", family = "Foraita", middle = NULL,
              email = "foraita@leibniz-bips.de", role = "ctb"))
-Maintainer: Janine Witte <witte@leibniz-bips.de>
+Maintainer: Ronja Foraita <foraita@leibniz-bips.de>
 Description: Constraint-based causal discovery using the PC algorithm while
     accounting for a partial node ordering, e.g. a partial temporal ordering
     when the data were collected in different waves of a cohort study.
@@ -18,6 +18,5 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.1
 License: GPL (>= 3)
-usethis: :use_github("https://github.com/bips-hb/tpc")       
 URL: https://github.com/bips-hb/tpc
 BugReports: https://github.com/bips-hb/tpc/issues
