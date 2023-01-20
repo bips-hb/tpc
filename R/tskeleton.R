@@ -241,12 +241,12 @@ tskeleton <- function (suffStat, indepTest, alpha, labels, p,
        for (j in 2:p) pMax[i, j] <- pMax[j, i] <- max(pMax[i, j], pMax[j, i])
     }
    Gobject <- if (sum(G) == 0) {
-      methods::new("graphNEL", nodes = labels)
+      new("graphNEL", nodes = labels)
    } else {
       colnames(G) <- rownames(G) <- labels
-      methods::as(G, "graphNEL")
+      as(G, "graphNEL")
    }
-   methods::new("pcAlgo", graph = Gobject, call = cl, n = integer(0),
+   new("pcAlgo", graph = Gobject, call = cl, n = integer(0),
        max.ord = as.integer(ord - 1), n.edgetests = n.edgetests,
        sepset = sepset, pMax = pMax, zMin = matrix(NA, 1, 1))
 }

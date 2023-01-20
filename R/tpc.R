@@ -66,10 +66,6 @@
 #' @author Original code by Markus Kalisch, Martin Maechler, and Diego Colombo.
 #' Modifications by Janine Witte.
 #'
-#' @importFrom graph numEdges
-#' @importFrom methods as
-#' @import pcalg
-
 #' @export
 #'
 #' @examples
@@ -322,7 +318,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
   skel@call <- cl
 
 
-  if (graph::numEdges(skel@graph) == 0) {
+  if (numEdges(skel@graph) == 0) {
     return(skel)
   }
   ## step II, orientation of v-structures:
@@ -331,7 +327,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
                             forbEdges = forbEdges)
 
   ## step III, orientation of edges between tiers:
-  gIII <- methods::as(skelII$sk@graph, "matrix")
+  gIII <- as(skelII$sk@graph, "matrix")
   for (t in unique(tiers)) {
     gIII[tiers>t, tiers==t] <- 0
   }
@@ -350,7 +346,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
 
   # step IV, Meek's rules
   skelIII <- skelII$sk
-  skelIII@graph <- methods::as(gIII, "graphNEL")
+  skelIII@graph <- as(gIII, "graphNEL")
   MeekRules(skelIII, verbose = verbose, unfVect = skelII$unfTripl,
             solve.confl = TRUE)
 }

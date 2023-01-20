@@ -19,7 +19,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Ronja Foraita \email{foraita@leibniz-bips.de} [contributor]
+\strong{Maintainer}: Ronja Foraita \email{foraita@leibniz-bips.de} (\href{https://orcid.org/0000-0003-2216-6653}{ORCID}) [contributor]
 
 Authors:
 \itemize{
