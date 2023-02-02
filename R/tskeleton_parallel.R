@@ -2,31 +2,21 @@
 #' @inheritParams <tpc::tskeleton>
 tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
                         method = c("stable.parallel"),
-                        numCores,
+                        numCores, clusterexport = NULL,
                         m.max = Inf, fixedGaps = NULL, fixedEdges = NULL,
                         NAdelete = TRUE,
                         verbose = FALSE,
-                        tiers = NULL
-                        ) {
-
-### tiers:     Numeric vector specifying the tier / time point for each variable.
-###            Must be of length 'p', if specified, or have the same length as
-###            'labels',if specified. A smaller number corresponds to an earlier
-###            tier / time point. Conditional independence testing is restricted
-###            such that if x is in tier t(x) and y is in t(y), only those
-###            variables are allowed in the conditioning set whose tier is not
-###            larger than max(t(x), t(y)).
+                        tiers = NULL) {
 
      cll <- match.call()
+
      ### new for parallel:
      if (missing(numCores)) {stop("Please specify 'numCores'.")}
      if (numCores < 2) {
        stop("The number of cores is insufficient to run parallel-PC")
      }
-     ###
      if (!missing(p))
-        stopifnot(is.numeric(p), length(p <- as.integer(p)) ==
-                     1, p >= 2)
+        stopifnot(is.numeric(p), length(p <- as.integer(p)) == 1, p >= 2)
      if (missing(labels)) {
         if (missing(p))
            stop("need to specify 'labels' or 'p'")
@@ -38,8 +28,10 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
         else if (p != length(labels))
            stop("'p' is not needed when 'labels' is specified, and must match length(labels)")
      }
+
      seq_p <- seq_len(p)
      method <- match.arg(method)
+
      if (is.null(fixedGaps)) {
         G <- matrix(TRUE, nrow = p, ncol = p)
      } else if (!identical(dim(fixedGaps), c(p, p)))
@@ -48,6 +40,7 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
         stop("fixedGaps must be symmetric")
      else G <- !fixedGaps
      diag(G) <- FALSE
+
      #################################################
      ## if no tiers are specified, everything is tier 0
      if (is.null(tiers)) {
@@ -67,79 +60,64 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
         stop("fixedEdges must be symmetric")
 
     pval <- NULL
+
     # seq_p is just the vector 1:p
     # sepset is a list of p lists with p elements each,
     # so each element represents an edge, and each edge is represented twice
+
     sepset <- lapply(seq_p, function(.) vector("list", p))
+
     # pMax is a matrix with one p-value per edge, at the beginning all p-values are -Inf
     pMax <- matrix(-Inf, nrow = p, ncol = p)
     diag(pMax) <- 1
     done <- FALSE
+
     # ord is the size of the conditioning set
     ord <- 0L
+
     # n.edgetests is for recording how many cond. ind. tests have been conducted in total
     n.edgetests <- numeric(1)
+
     # G is a (pxp)-matrix (each entry represents an edge and each edge is represented twice);
     # at the beginning, all elements are TRUE except for the diagonal
 
     ### new for parallel:
-
     # prepare the workers
+
     workers <- NULL
     if (Sys.info()[['sysname']] == 'Windows') {
       workers <- makeCluster(numCores, type = "PSOCK")
     } else if (Sys.info()[['sysname']] == 'Linux') {
       workers <- makeCluster(numCores, type = "MPI")}
 
-    # eval(suffStat)
-    clusterEvalQ(workers, {
-         library(pcalg)
-         library(micd)
-         #library(tpc)
-         library(Rfast)})
+    clusterEvalQ(cl = workers, {
+         library(pcalg)})
 
-
-    # cl <- makeCluster(numCores, type = "MPI")
-    # if (exists("which.is")) { clusterExport(cl, c("which.is", "cova")) }
-    # if (exists("gaussMItest")) {
-    #   clusterExport(cl, c("gaussMItest", "disMItest", "mixMItest", "listsum", "dfCG",
-    #                       "df_h", "df_f", "maxJoint", "maxCell", "evalJoint", "evalCell",
-    #                       "multinomialLikelihood", "covm", "mvnorm.mle",
-    #                       "data.frame.to_matrix", "dmvnorm")) }
-    #
-    # clusterExport(cl, c("getNextSet", "zStatMI", "log.q1pm", "findInd"))
-    # # Ronja:
-    # clusterEvalQ(cl, {
-    #   library(micd)
-    #   library(Rmpi)
-    #   setwd("/home/foraita/ccg/R")
-    #   files.sources <- list.files()
-    #   sapply(files.sources, source)
-    #   setwd("/home/foraita/2020_CausalGraph")
-    # })
-    #
-    #clusterExport(cl, c("fixedEdges", "tiers", "verbose", "suffStat", "indepTest",
-    # "alpha", "seq_p"), envir=environment())
-    # did not always work -> use as arguments to findInd
+    if (!is.null(clusterexport)){
+      print(clusterexport)
+       clusterExport(cl = workers, clusterexport)
+      message(c(paste("The following functions are exported to", numCores,
+                    "nodes:  "), paste(clusterexport, col=" ")))
+      }
 
     while (!done && any(G) && ord <= m.max) {
       # done is FALSE if for every remaining edge, the number of neighbours is smaller
       # than the new ord
        n.edgetests[ord1 <- ord + 1L] <- 0
        done <- TRUE
+
        # ind is a two-column matrix, each row represents an edge (indices of both endpoints)
        ind <- which(G, arr.ind = TRUE)
+
        # the next command just reorders ind
        ind <- ind[order(ind[, 1]), ]
+
        # how many edges are remaining?
        remEdges <- nrow(ind)
        if (verbose)
           cat("Order=", ord, "; remaining edges:", remEdges,
               "\n", sep = "")
-       #if (method == "stable") {
-         # G is split into p vectors, each vector respresenting the neighbours of one node
-          #G.l <- split(G, gl(p, p))
-       #}
+
 
        ### new for parallel:
        res <- parLapply(workers, 1:nrow(ind), findInd,
@@ -172,7 +150,6 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
 
    ### new for parallel:
    stopCluster(workers)
-
 
 
    for (i in 1:(p - 1)) {

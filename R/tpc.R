@@ -24,7 +24,6 @@
 #' are not, in which case \code{labels} is set to \code{1:p}.
 #' @param skel.method Character string specifying method; the default, "stable" provides
 #' an order-independent skeleton, see [tpc::tskeleton()].
-#' @param numCores The numbers of CPU cores to be used.
 #' @param forbEdges A logical matrix of dimension p*p. If \code{[i,j]} is TRUE, then the
 #' directed edge i->j is forbidden. If both \code{[i,j]} and \code{[j,i]} are TRUE, then any type of
 #' edge between i and j is forbidden.
@@ -45,6 +44,8 @@
 #' incoming edges, i.e. no parents, and are themselves parents of all non-context variables
 #' in the same tier.
 #' @param verbose if \code{TRUE}, detailed output is provided.
+#' @param numCores The numbers of CPU cores to be used.
+#' @param clusterexport Character vector. Lists functions to be exported to nodes if numCores > 1.
 #'
 #' @details See \code{pcalg::\link[pcalg]{pc}} for further information on the PC algorithm.
 #'
@@ -66,10 +67,6 @@
 #' @author Original code by Markus Kalisch, Martin Maechler, and Diego Colombo.
 #' Modifications by Janine Witte.
 #'
-#' @importFrom graph numEdges
-#' @importFrom methods as
-#' @import pcalg
-
 #' @export
 #'
 #' @examples
@@ -92,7 +89,8 @@
 #'
 #' tpc.fit3 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
 #'                 indepTest = gaussCItest, alpha = 0.01, labels = lab, tiers = tiers,
-#'                 skel.method = "stable.parallel", numCores = 2)
+#'                 skel.method = "stable.parallel",
+#'                 numCores = 2, clusterexport = c("cor", "ecdf"))
 #'
 #' if(require("Rgraphviz", character.only = TRUE, quietly = TRUE)){
 #'  data("true_sim")
@@ -152,8 +150,8 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
                  forbEdges = NULL, m.max = Inf,
                  conservative = FALSE, maj.rule = TRUE,
                  tiers = NULL, context.all = NULL, context.tier = NULL,
-                 numCores = NULL,
-                 verbose = FALSE){
+                 verbose = FALSE,
+                 numCores = NULL, clusterexport = NULL){
 
   cl <- match.call()
   if (!missing(p)) {
@@ -312,7 +310,8 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
                                fixedEdges = fixedEdges,
                                tiers = tiers,
                                m.max = m.max, verbose = verbose,
-                               numCores = numCores)
+                               numCores = numCores,
+                               clusterexport = clusterexport)
   } else {
     skel <- tskeleton(suffStat, indepTest, alpha, labels = labels,
                       method = skel.method, fixedGaps = fixedGaps, fixedEdges = fixedEdges,
@@ -322,7 +321,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
   skel@call <- cl
 
 
-  if (graph::numEdges(skel@graph) == 0) {
+  if (numEdges(skel@graph) == 0) {
     return(skel)
   }
   ## step II, orientation of v-structures:
@@ -331,7 +330,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
                             forbEdges = forbEdges)
 
   ## step III, orientation of edges between tiers:
-  gIII <- methods::as(skelII$sk@graph, "matrix")
+  gIII <- as(skelII$sk@graph, "matrix")
   for (t in unique(tiers)) {
     gIII[tiers>t, tiers==t] <- 0
   }
@@ -350,7 +349,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
 
   # step IV, Meek's rules
   skelIII <- skelII$sk
-  skelIII@graph <- methods::as(gIII, "graphNEL")
+  skelIII@graph <- as(gIII, "graphNEL")
   MeekRules(skelIII, verbose = verbose, unfVect = skelII$unfTripl,
             solve.confl = TRUE)
 }

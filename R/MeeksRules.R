@@ -172,7 +172,7 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL,
       c <- which(search.pdag[a, ] == 1 & search.pdag[, a] == 1 &
                    search.pdag[, b] == 1 & search.pdag[b, ] == 0)
       if (length(c) >= 2) {
-        cmb.C <- utils::combn(c, 2)
+        cmb.C <- combn(c, 2)
         cC1 <- cmb.C[1, ]
         cC2 <- cmb.C[2, ]
         for (j in seq_along(cC1)) {
@@ -320,7 +320,7 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL,
 
   if (numEdges(gInput@graph) == 0)
     return(gInput)
-  g <- methods::as(gInput@graph, "matrix")
+  g <- as(gInput@graph, "matrix")
   p <- nrow(g)
   pdag <- g
 
@@ -341,6 +341,6 @@ MeekRules <- function (gInput, verbose = FALSE, unfVect = NULL,
     if (all(pdag == old_pdag))
       break
   }
-  gInput@graph <- methods::as(pdag, "graphNEL")
+  gInput@graph <- as(pdag, "graphNEL")
   gInput
 }

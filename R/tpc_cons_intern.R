@@ -56,8 +56,6 @@
 #' Context variables specified via \code{context.all} or \code{context.tier} are
 #' not considered as candidate colliders or candidate parents of colliders.
 #'
-#' @importFrom methods as
-#'
 #' @return
 #' \describe{
 #' \item{unfTripl}{numeric vector of triples coded as numbers (via \code{pcalg::triple2numb})
@@ -89,7 +87,7 @@ tpc.cons.intern <- function(
     pdag
   }
 
-  g <- methods::as(sk@graph, "matrix")
+  g <- as(sk@graph, "matrix")
   stopifnot(all(g == t(g)))
   p <- as.numeric(dim(g)[1])
   if (is.null(tiers)) { tiers <- rep(1, p) }
@@ -215,7 +213,7 @@ tpc.cons.intern <- function(
         z <- tripleMatrix[i,3]
         pdag <- orientConflictCollider(pdag, x, y, z)
       }
-      sk@graph <- methods::as(pdag, "graphNEL")
+      sk@graph <- as(pdag, "graphNEL")
     }
     ############################# end new code
   }

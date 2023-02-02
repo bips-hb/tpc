@@ -35,9 +35,7 @@
 #' @references Maathuis MH, Kalisch M, & Buehlmann P (2009). Estimating high-dimensional
 #' intervention effects from observational data. The Annals of Statistics, 37(6A), 3133-3164.
 #'
-#' @import pcalg
 #' @import igraph
-#' @importFrom graphics legend
 #'
 #' @export
 #'
@@ -93,10 +91,10 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
   if ( method == "local" ) {
     ### possible parents of X
     possPa <-
-      sort(unlist(igraph::adjacent_vertices(pc.obj$ig, x.pos, mode="in")))
+      sort(unlist(adjacent_vertices(pc.obj$ig, x.pos, mode="in")))
 
     ### definite parents of X
-    Pa <- sort(unlist(igraph::adjacent_vertices(pc.obj$dg, x.pos, mode="in")))
+    Pa <- sort(unlist(adjacent_vertices(pc.obj$dg, x.pos, mode="in")))
 
     ### ambiguous parents of X
     amPa <- setdiff(possPa, Pa)
@@ -119,14 +117,14 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
 
     ### plot subgraph showing all possible parents
     if ( plot ) {
-      sub <- igraph::induced_subgraph(pc.obj$ig, vids=c(possPa, x.pos))
+      sub <- induced_subgraph(pc.obj$ig, vids=c(possPa, x.pos))
       col <- rep("white", length(possPa))
       col[names(V(sub)) %in% pc.obj$lab[amPa]] <- "yellow"
       col[names(V(sub)) %in% pc.obj$lab[x.pos]] <- "green"
       col[names(V(sub)) %in% pc.obj$lab[y.pos]] <- "red"
 
       plot(sub, vertex.color=col)
-      graphics::legend('topleft', legend=c("exposure","parents","ambiguous"),
+       legend('topleft', legend=c("exposure","parents","ambiguous"),
                        pt.bg=c("green", "white", "yellow"), pch=21)
     }
 
@@ -284,7 +282,7 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
       col[names(V(sub)) %in% pc.obj$lab[c(x.pos,y.pos)]] <- "green"
 
       plot(sub, vertex.color=col)
-      graphics::legend('topleft',
+          legend('topleft',
                 legend=c("exp./outc.", "mediators", "parents med./outc.", "ambiguous"),
                  pt.bg=c("green", "gray", "white", "yellow"), pch=21)
     }
@@ -337,9 +335,9 @@ ida_invalid <- function(x.pos, y.pos, graphEst, method = NULL,
       ok <- noCycles_pcalg(am_dir)
       if (!ok) {return(NA)}
 
-      ig2 <- igraph::graph_from_adjacency_matrix(t(am))
+      ig2 <- graph_from_adjacency_matrix(t(am))
       # mediators = causal nodes (forbidden) including x and y
-      MedPaths2 <- igraph::all_simple_paths(ig2, from=x.pos, to=y.pos, mode="out")
+      MedPaths2 <- all_simple_paths(ig2, from=x.pos, to=y.pos, mode="out")
       MedNodes2 <- unique(unlist(MedPaths2))
       if ( length(MedNodes2)==0 ) {return(0)}
       # remove x
@@ -383,8 +381,9 @@ prep.graph.ida <- function(graphEst){
   }
 
   ### adjacency matrix
-  am <- pcalg::wgtMatrix(graphEst)
+  am <- wgtMatrix(graphEst)
   am[am==2] <- 1
+  am[am > 0 & am < 1] <- 1
 
   ### check if input is a valid pdag
   if ( isValidGraph(am, type="pdag") ) {
@@ -392,15 +391,15 @@ prep.graph.ida <- function(graphEst){
   }
 
   ### convert into an igraph object
-  ig <- igraph::graph_from_adjacency_matrix(t(am))
+  ig <- graph_from_adjacency_matrix(t(am))
 
   ### directed subgraph
   am_dir <- am - am * t(am)
-  dg <- igraph::graph_from_adjacency_matrix(t(am_dir))
+  dg <- graph_from_adjacency_matrix(t(am_dir))
 
   ### undirected subgraph
   am_un <- am * t(am)
-  ug <- igraph::graph_from_adjacency_matrix(t(am_un))
+  ug <- graph_from_adjacency_matrix(t(am_un))
 
   ### triangular adjacency matrix of undirected subgraph
   am_un_tri <- am_un

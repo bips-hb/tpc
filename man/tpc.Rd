@@ -18,8 +18,9 @@ tpc(
   tiers = NULL,
   context.all = NULL,
   context.tier = NULL,
+  verbose = FALSE,
   numCores = NULL,
-  verbose = FALSE
+  clusterexport = NULL
 )
 }
 \arguments{
@@ -72,9 +73,11 @@ names of tier-specific context variables. Tier-specific context variables have n
 incoming edges, i.e. no parents, and are themselves parents of all non-context variables
 in the same tier.}
 
+\item{verbose}{if \code{TRUE}, detailed output is provided.}
+
 \item{numCores}{The numbers of CPU cores to be used.}
 
-\item{verbose}{if \code{TRUE}, detailed output is provided.}
+\item{clusterexport}{Character vector. Lists functions to be exported to nodes if numCores > 1.}
 }
 \value{
 An object of \code{\link[base]{class}} "\code{pcAlgo}"
@@ -123,7 +126,8 @@ tpc.fit2 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
 
 tpc.fit3 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
                 indepTest = gaussCItest, alpha = 0.01, labels = lab, tiers = tiers,
-                skel.method = "stable.parallel", numCores = 2)
+                skel.method = "stable.parallel",
+                numCores = 2, clusterexport = c("cor", "ecdf"))
 
 if(require("Rgraphviz", character.only = TRUE, quietly = TRUE)){
  data("true_sim")
