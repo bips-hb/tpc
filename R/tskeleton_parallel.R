@@ -91,7 +91,8 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
       workers <- makeCluster(numCores, type = "MPI")}
 
     clusterEvalQ(cl = workers, {
-         library(pcalg)})
+         library(pcalg)
+         library(tpc)})
 
     if (!is.null(clusterexport)){
       print(clusterexport)
