@@ -2,12 +2,11 @@
 #' @inheritParams <tpc::tskeleton>
 tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
                         method = c("stable.parallel"),
-                        numCores,
+                        numCores, clusterexport = NULL,
                         m.max = Inf, fixedGaps = NULL, fixedEdges = NULL,
                         NAdelete = TRUE,
                         verbose = FALSE,
-                        tiers = NULL
-                        ) {
+                        tiers = NULL) {
 
      cll <- match.call()
 
@@ -16,10 +15,8 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
      if (numCores < 2) {
        stop("The number of cores is insufficient to run parallel-PC")
      }
-
      if (!missing(p))
-        stopifnot(is.numeric(p), length(p <- as.integer(p)) ==
-                     1, p >= 2)
+        stopifnot(is.numeric(p), length(p <- as.integer(p)) == 1, p >= 2)
      if (missing(labels)) {
         if (missing(p))
            stop("need to specify 'labels' or 'p'")
@@ -86,17 +83,22 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
 
     ### new for parallel:
     # prepare the workers
+
     workers <- NULL
     if (Sys.info()[['sysname']] == 'Windows') {
       workers <- makeCluster(numCores, type = "PSOCK")
     } else if (Sys.info()[['sysname']] == 'Linux') {
       workers <- makeCluster(numCores, type = "MPI")}
 
-    # eval(suffStat)
-    clusterEvalQ(workers, {
-         library(pcalg)
-         library(micd)
-         library(Rfast)})
+    clusterEvalQ(cl = workers, {
+         library(pcalg)})
+
+    if (!is.null(clusterexport)){
+      print(clusterexport)
+       clusterExport(cl = workers, clusterexport)
+      message(c(paste("The following functions are exported to", numCores,
+                    "nodes:  "), paste(clusterexport, col=" ")))
+      }
 
     while (!done && any(G) && ord <= m.max) {
       # done is FALSE if for every remaining edge, the number of neighbours is smaller
