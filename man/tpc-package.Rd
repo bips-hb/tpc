@@ -4,7 +4,7 @@
 \name{tpc-package}
 \alias{tpc-package}
 \alias{_PACKAGE}
-\title{Temporal PC Algorithm}
+\title{Tiered PC Algorithm}
 \description{
 Constraint-based causal discovery using the PC algorithm while accounting for a
 partial node ordering, e.g. a partial temporal ordering when the data were
