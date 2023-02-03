@@ -45,6 +45,8 @@
 #' in the same tier.
 #' @param verbose if \code{TRUE}, detailed output is provided.
 #' @param numCores The numbers of CPU cores to be used.
+#' @param cl.type The cluster type. Default value is \code{"PSOCK"}.
+#' For High-performance clusters use \code{"MPI"}. See also \code{parallel::\link[parallel]{makeCluster}}.
 #' @param clusterexport Character vector. Lists functions to be exported to nodes if numCores > 1.
 #'
 #' @details See \code{pcalg::\link[pcalg]{pc}} for further information on the PC algorithm.
@@ -151,7 +153,8 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
                  conservative = FALSE, maj.rule = TRUE,
                  tiers = NULL, context.all = NULL, context.tier = NULL,
                  verbose = FALSE,
-                 numCores = NULL, clusterexport = NULL){
+                 numCores = NULL, cl.type = "PSOCK",
+                 clusterexport = NULL){
 
   cl <- match.call()
   if (!missing(p)) {
@@ -218,6 +221,9 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
   if ((!conservative) && (!maj.rule)) {
     stop("Choose one of conservative PC and majority rule PC!")
   }
+
+  if(!is.null(numCores) & is.null(cl.type)) stop("Specify cluster type.")
+
 
   ## generate fixedEdges and fixedGaps according to context.all and context.tier
   fixedEdges <- matrix(FALSE, p, p)
@@ -311,6 +317,7 @@ tpc <- function (suffStat, indepTest, alpha, labels, p,
                                tiers = tiers,
                                m.max = m.max, verbose = verbose,
                                numCores = numCores,
+                               cl.type = cl.type,
                                clusterexport = clusterexport)
   } else {
     skel <- tskeleton(suffStat, indepTest, alpha, labels = labels,

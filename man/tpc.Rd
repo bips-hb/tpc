@@ -20,6 +20,7 @@ tpc(
   context.tier = NULL,
   verbose = FALSE,
   numCores = NULL,
+  cl.type = "PSOCK",
   clusterexport = NULL
 )
 }
@@ -76,6 +77,9 @@ in the same tier.}
 \item{verbose}{if \code{TRUE}, detailed output is provided.}
 
 \item{numCores}{The numbers of CPU cores to be used.}
+
+\item{cl.type}{The cluster type. Default value is \code{"PSOCK"}.
+For High-performance clusters use \code{"MPI"}. See also \code{parallel::\link[parallel]{makeCluster}}.}
 
 \item{clusterexport}{Character vector. Lists functions to be exported to nodes if numCores > 1.}
 }

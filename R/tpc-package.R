@@ -19,8 +19,6 @@ utils::globalVariables(c("remEdges"))
 #' @importFrom methods as new
 #' @importFrom parallel clusterEvalQ clusterExport makeCluster parLapply stopCluster
 #' @import pcalg
-#' @importFrom snow clusterEvalQ clusterExport makeCluster makeMPICluster makeSockCluster
-#' parLapply stopCluster
 #' @importFrom utils combn
 #  use_import_from("parallel", 'makeCluster')
 ## usethis namespace: end

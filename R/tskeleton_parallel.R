@@ -2,7 +2,7 @@
 #' @inheritParams <tpc::tskeleton>
 tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
                         method = c("stable.parallel"),
-                        numCores, clusterexport = NULL,
+                        numCores, clusterexport = NULL, cl.type,
                         m.max = Inf, fixedGaps = NULL, fixedEdges = NULL,
                         NAdelete = TRUE,
                         verbose = FALSE,
@@ -84,19 +84,21 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
     ### new for parallel:
     # prepare the workers
 
-    workers <- NULL
-    if (Sys.info()[['sysname']] == 'Windows') {
-      workers <- makeCluster(numCores, type = "PSOCK")
-    } else if (Sys.info()[['sysname']] == 'Linux') {
-      workers <- makeCluster(numCores, type = "MPI")}
+    # workers <- NULL
+    # if (Sys.info()[['sysname']] == 'Windows') {
+    #   workers <- makeCluster(numCores, type = "PSOCK")
+    # } else if (Sys.info()[['sysname']] == 'Linux') {
+    #   workers <- makeCluster(numCores, type = "MPI")}
 
-    clusterEvalQ(cl = workers, {
-         library(pcalg)
-         library(tpc)})
+    workers <- parallel::makeCluster(numCores, type = cl.type)
 
+    parallel::clusterEvalQ(cl = workers, library(pcalg))
+    # parallel::clusterExport(cl = workers,
+    #           varlist = c("suffStat", "tiers", "fixedEdges", "indepTest",
+    #                       "G", "ind", "ord", "pMax", "alpha", "seq_p"))
     if (!is.null(clusterexport)){
       print(clusterexport)
-       clusterExport(cl = workers, clusterexport)
+      parallel::clusterExport(cl = workers, varlist = clusterexport)
       message(c(paste("The following functions are exported to", numCores,
                     "nodes:  "), paste(clusterexport, col=" ")))
       }
@@ -121,7 +123,8 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
 
 
        ### new for parallel:
-       res <- parLapply(workers, 1:nrow(ind), findInd,
+       res <- parallel::parLapply(workers, 1:nrow(ind),
+                        findInd,
                         G = G, ind = ind, ord = ord, pMax = pMax,
                         suffStat = suffStat,
                         fixedEdges = fixedEdges,
@@ -150,7 +153,7 @@ tskeleton_parallel <- function (suffStat, indepTest, alpha, labels, p,
     }
 
    ### new for parallel:
-   stopCluster(workers)
+   parallel::stopCluster(workers)
 
 
    for (i in 1:(p - 1)) {
