@@ -15,7 +15,6 @@ utils::globalVariables(c("remEdges"))
 ## usethis namespace: start
 #' @importFrom graph numEdges
 #' @importFrom graphics legend
-#' @importFrom igraph adjacent_vertices all_simple_paths graph_from_adjacency_matrix induced_subgraph
 #' @importFrom methods as new
 #' @importFrom parallel clusterEvalQ clusterExport makeCluster parLapply stopCluster
 #' @import pcalg
