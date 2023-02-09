@@ -133,7 +133,8 @@ tpc.fit3 <- tpc(suffStat = list(C = cor(dat_sim), n = n),
                 skel.method = "stable.parallel",
                 numCores = 2, clusterexport = c("cor", "ecdf"))
 
-if(require("Rgraphviz", character.only = TRUE, quietly = TRUE) & packageVersion("igraph") < "1.4.0"){
+if(require("Rgraphviz", character.only = TRUE, quietly = TRUE) &
+   packageVersion("igraph") < "1.4.0"){
  data("true_sim")
  par(mfrow = c(1,3))
  plot(true_sim, main = "True DAG")
@@ -153,7 +154,8 @@ if(require("Rgraphviz", character.only = TRUE, quietly = TRUE) & packageVersion(
                  indepTest = gaussCItest, alpha = 0.01,labels = lab,
                  forbEdges = forb, tiers = tiers)
 
- if (require(Rgraphviz) & packageVersion("igraph") < "1.4.0")) {
+ if (require(Rgraphviz) &
+     packageVersion("igraph") < "1.4.0") {
  # compare estimated CPDAGs
    data("true_sim")
    par(mfrow = c(1,3))
@@ -167,7 +169,8 @@ if(require("Rgraphviz", character.only = TRUE, quietly = TRUE) & packageVersion(
                  indepTest = gaussCItest, alpha = 0.01, labels = lab,
                  tiers = tiers, context.tier = "A1")
 
- if (require(Rgraphviz) & packageVersion("igraph") < "1.4.0")) {
+ if (require(Rgraphviz) &
+     packageVersion("igraph") < "1.4.0") {
  # compare estimated CPDAGs
   data("true_sim")
   par(mfrow = c(1,1))
@@ -179,7 +182,8 @@ if(require("Rgraphviz", character.only = TRUE, quietly = TRUE) & packageVersion(
                  indepTest = gaussCItest, alpha = 0.01, labels = lab,
                  tiers = tiers, context.all = "A1")
 
- if (require(Rgraphviz) & packageVersion("igraph") < "1.4.0")) {
+ if (require(Rgraphviz) &
+     packageVersion("igraph") < "1.4.0") {
  # compare estimated CPDAGs
  data("true_sim")
  par(mfrow = c(1,1))
