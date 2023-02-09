@@ -94,7 +94,7 @@
 #'                 skel.method = "stable.parallel",
 #'                 numCores = 2, clusterexport = c("cor", "ecdf"))
 #'
-#' if(require("Rgraphviz", character.only = TRUE, quietly = TRUE)){
+#' if(require("Rgraphviz", character.only = TRUE, quietly = TRUE) & packageVersion("igraph") < "1.4.0"){
 #'  data("true_sim")
 #'  par(mfrow = c(1,3))
 #'  plot(true_sim, main = "True DAG")
@@ -114,7 +114,7 @@
 #'                  indepTest = gaussCItest, alpha = 0.01,labels = lab,
 #'                  forbEdges = forb, tiers = tiers)
 #'
-#'  if (require(Rgraphviz)) {
+#'  if (require(Rgraphviz) & packageVersion("igraph") < "1.4.0")) {
 #'  # compare estimated CPDAGs
 #'    data("true_sim")
 #'    par(mfrow = c(1,3))
@@ -128,7 +128,7 @@
 #'                  indepTest = gaussCItest, alpha = 0.01, labels = lab,
 #'                  tiers = tiers, context.tier = "A1")
 #'
-#'  if (require(Rgraphviz)) {
+#'  if (require(Rgraphviz) & packageVersion("igraph") < "1.4.0")) {
 #'  # compare estimated CPDAGs
 #'   data("true_sim")
 #'   par(mfrow = c(1,1))
@@ -140,7 +140,7 @@
 #'                  indepTest = gaussCItest, alpha = 0.01, labels = lab,
 #'                  tiers = tiers, context.all = "A1")
 #'
-#'  if (require(Rgraphviz)) {
+#'  if (require(Rgraphviz) & packageVersion("igraph") < "1.4.0")) {
 #'  # compare estimated CPDAGs
 #'  data("true_sim")
 #'  par(mfrow = c(1,1))
