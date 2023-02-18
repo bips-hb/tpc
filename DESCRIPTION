@@ -3,16 +3,18 @@ Type: Package
 Title: Tiered PC Algorithm
 Version: 1.0
 Authors@R: c(
-      person(given = "Janine", family = "Witte", middle = NULL,
+      person(given = "Janine", family = "Witte", 
              email = "witte@leibniz-bips.de", role = c("aut")),
-      person(given = "Ronja", family = "Foraita", middle = NULL,
+      person(given = "Ronja", family = "Foraita", 
              email = "foraita@leibniz-bips.de", role = c("cre","ctb"),
              comment = c(ORCID = "0000-0003-2216-6653")),
       person("DFG", role = "fnd"))
 Maintainer: Ronja Foraita <foraita@leibniz-bips.de>
 Description: Constraint-based causal discovery using the PC algorithm while
-    accounting for a partial node ordering, e.g. a partial temporal ordering
+    accounting for a partial node ordering, for example a partial temporal ordering
     when the data were collected in different waves of a cohort study.
+    Andrews RM, Foraita R, Didelez V, Witte J (2021) <arXiv:2108.13395>  
+    provide a guide how to use tpc to analyse cohort data.
 Depends: pcalg, R (>= 3.5.0)
 Imports: graph, graphics, methods, parallel, utils
 Suggests: 

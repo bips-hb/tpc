@@ -50,6 +50,8 @@
 #' @param clusterexport Character vector. Lists functions to be exported to nodes if numCores > 1.
 #'
 #' @details See \code{pcalg::\link[pcalg]{pc}} for further information on the PC algorithm.
+#' The PC algorithm is named after its developers Peter Spirtes and Clark Glymour
+#' (Spirtes et al., 2000).
 #'
 #' Specifying a tier for each variable using the \code{tier} argument has the
 #' following effects:
@@ -67,7 +69,14 @@
 #' the underlying DAG.
 #'
 #' @author Original code by Markus Kalisch, Martin Maechler, and Diego Colombo.
-#' Modifications by Janine Witte.
+#' Modifications by Janine Witte (Kalisch et al., 2012).
+#'
+#' @references   M. Kalisch, M. Maechler, D. Colombo, M.H. Maathuis and P. Buehlmann (2012).
+#' Causal Inference Using Graphical Models with the R Package pcalg.
+#' Journal of Statistical Software 47(11): 1--26.
+#'
+#' P. Spirtes, C. Glymour and R. Scheines (2000). Causation, Prediction,
+#' and Search, 2nd edition. The MIT Press. https://philarchive.org/archive/SPICPA-2.
 #'
 #' @export
 #'
@@ -96,10 +105,11 @@
 #'
 #' if(requireNamespace("Rgraphviz", quietly = TRUE)){
 #'  data("true_sim")
-#'  par(mfrow = c(1,3))
+#'  oldpar <- par(mfrow = c(1,3))
 #'  plot(true_sim, main = "True DAG")
 #'  plot(tpc.fit, main = "PC estimate")
 #'  plot(tpc.fit2, main = "tPC estimate")
+#'  par(oldpar)
 #'  }
 #'
 #'  # require that there is no edge between A1 and A1, and that any edge between A2 and B2
@@ -117,9 +127,10 @@
 #'  if (requireNamespace("Rgraphviz", quietly = TRUE)) {
 #'  # compare estimated CPDAGs
 #'    data("true_sim")
-#'    par(mfrow = c(1,3))
+#'    oldpar <- par(mfrow = c(1,2))
 #'    plot(tpc.fit2, main = "old tPC estimate")
 #'    plot(tpc.fit3, main = "new tPC estimate")
+#'    par(oldpar)
 #'  }
 #'  # force edge from A1 to all other nodes measured at time 1
 #'  # into the graph (note that the edge from A1 to A2 is then
@@ -131,7 +142,6 @@
 #'  if (requireNamespace("Rgraphviz", quietly = TRUE)) {
 #'  # compare estimated CPDAGs
 #'   data("true_sim")
-#'   par(mfrow = c(1,1))
 #'   plot(tpc.fit4, main = "alternative tPC estimate")
 #'  }
 #'
@@ -143,7 +153,6 @@
 #'  if (requireNamespace("Rgraphviz", quietly = TRUE)) {
 #'  # compare estimated CPDAGs
 #'  data("true_sim")
-#'  par(mfrow = c(1,1))
 #'  plot(tpc.fit5, main = "alternative tPC estimate")
 #'  }
 #'

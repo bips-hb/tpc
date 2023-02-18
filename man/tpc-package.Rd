@@ -9,6 +9,8 @@
 Constraint-based causal discovery using the PC algorithm while accounting for a
 partial node ordering, e.g. a partial temporal ordering when the data were
 collected in different waves of a cohort study.
+Andrews RM, Foraita R, Didelez V, Witte J (2021) <arXiv:2108.13395>
+provide a guide how to use tpc to analyse cohort data.
 }
 \seealso{
 Useful links:
